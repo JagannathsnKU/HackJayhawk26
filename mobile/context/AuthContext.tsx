@@ -1,6 +1,12 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { AuthUser } from '../services/authApi';
-import { loginRequest, meRequest, registerRequest } from '../services/authApi';
+import {
+  AUTH_API_DISABLED_FOR_DEV,
+  DEV_AUTH_USER,
+  loginRequest,
+  meRequest,
+  registerRequest,
+} from '../services/authApi';
 import { clearToken, readToken, saveToken } from '../services/authStorage';
 
 type AuthState = {
@@ -24,6 +30,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       try {
         const stored = await readToken();
+        if (AUTH_API_DISABLED_FOR_DEV) {
+          // No network: keep a stable dev session (see authApi.ts).
+          if (stored) {
+            if (!cancelled) {
+              setToken(stored);
+              setUser(DEV_AUTH_USER);
+            }
+          } else {
+            const t = 'dev-jwt-stub';
+            await saveToken(t);
+            if (!cancelled) {
+              setToken(t);
+              setUser(DEV_AUTH_USER);
+            }
+          }
+          return;
+        }
         if (!stored) {
           return;
         }

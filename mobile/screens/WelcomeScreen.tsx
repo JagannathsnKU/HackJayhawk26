@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AnomalousMatterHero } from '../components/ui/anomalous-matter-hero';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { SecondaryButton } from '../components/SecondaryButton';
+import { useAuth } from '../context/AuthContext';
 import { getThemeColors } from '../utils/theme';
 import type { RootStackScreenProps } from '../navigation/types';
 
@@ -11,6 +12,8 @@ type Props = RootStackScreenProps<'Welcome'>;
 
 export function WelcomeScreen({ navigation }: Props) {
   const colors = getThemeColors();
+  const { user, token } = useAuth();
+  const isLoggedIn = Boolean(user && token);
 
   return (
     <SafeAreaView
@@ -30,10 +33,16 @@ export function WelcomeScreen({ navigation }: Props) {
         </View>
         <View style={[styles.footer, { backgroundColor: colors.background }]}>
           <View style={styles.buttonWrap}>
-            <PrimaryButton title="Sign in" onPress={() => navigation.navigate('Login')} />
-            <View style={styles.secondaryWrap}>
-              <SecondaryButton title="Create account" onPress={() => navigation.navigate('Register')} />
-            </View>
+            {isLoggedIn ? (
+              <PrimaryButton title="Continue to app" onPress={() => navigation.replace('MainTabs')} />
+            ) : (
+              <>
+                <PrimaryButton title="Sign in" onPress={() => navigation.navigate('Login')} />
+                <View style={styles.secondaryWrap}>
+                  <SecondaryButton title="Create account" onPress={() => navigation.navigate('Register')} />
+                </View>
+              </>
+            )}
           </View>
         </View>
       </View>

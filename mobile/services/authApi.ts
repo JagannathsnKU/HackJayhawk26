@@ -8,6 +8,11 @@ export type AuthUser = { id: string; email: string };
 
 export type AuthResponse = { token: string; user: AuthUser };
 
+/** Flip to `false` to use real network auth again. */
+export const AUTH_API_DISABLED_FOR_DEV = true;
+
+export const DEV_AUTH_USER: AuthUser = { id: 'dev-user', email: 'dev@local' };
+
 async function parseError(res: Response): Promise<string> {
   try {
     const data = (await res.json()) as { error?: string };
@@ -28,6 +33,12 @@ async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
 }
 
 export async function registerRequest(email: string, password: string): Promise<AuthResponse> {
+  if (AUTH_API_DISABLED_FOR_DEV) {
+    return {
+      token: 'dev-jwt-stub',
+      user: { ...DEV_AUTH_USER, email: email.trim() || DEV_AUTH_USER.email },
+    };
+  }
   const res = await apiFetch('/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -38,6 +49,12 @@ export async function registerRequest(email: string, password: string): Promise<
 }
 
 export async function loginRequest(email: string, password: string): Promise<AuthResponse> {
+  if (AUTH_API_DISABLED_FOR_DEV) {
+    return {
+      token: 'dev-jwt-stub',
+      user: { ...DEV_AUTH_USER, email: email.trim() || DEV_AUTH_USER.email },
+    };
+  }
   const res = await apiFetch('/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -48,6 +65,9 @@ export async function loginRequest(email: string, password: string): Promise<Aut
 }
 
 export async function meRequest(token: string): Promise<{ user: AuthUser }> {
+  if (AUTH_API_DISABLED_FOR_DEV) {
+    return { user: DEV_AUTH_USER };
+  }
   const res = await apiFetch('/auth/me', {
     headers: { Authorization: `Bearer ${token}` },
   });

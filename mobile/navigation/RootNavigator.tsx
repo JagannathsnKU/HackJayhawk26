@@ -21,8 +21,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
   const c = getThemeColors();
-  const { isReady, user, token } = useAuth();
-  const authenticated = Boolean(user && token);
+  const { isReady } = useAuth();
 
   const navTheme = {
     ...DarkTheme,
@@ -48,7 +47,7 @@ export function RootNavigator() {
   return (
     <NavigationContainer ref={navigationRef} theme={navTheme}>
       <Stack.Navigator
-        initialRouteName={authenticated ? 'MainTabs' : 'Welcome'}
+        initialRouteName="Welcome"
         screenOptions={{
           headerShadowVisible: false,
           headerStyle: { backgroundColor: c.surface },
