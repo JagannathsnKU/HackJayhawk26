@@ -30,17 +30,17 @@ export function PaymentApprovalScreen({ navigation, route }: Props) {
     setBusy(true);
     try {
       const result = await services.payment.authorizePayment({
-        amountUsd,
+        amountUsd: amountUsd ?? 0,
         description: title,
         itineraryItemId,
       });
       const msg =
         result.status === 'approved_auto'
-          ? 'Approved automatically (mock).'
+          ? 'Recorded (stub). In production, confirmation ties to your TMC / card auth.'
           : result.status === 'requires_approval'
-            ? 'Approval request queued (mock).'
-            : 'Not allowed (mock).';
-      Alert.alert('Payment', msg, [{ text: 'OK', onPress: () => navigation.goBack() }]);
+            ? 'Approval request queued (stub).'
+            : 'Blocked (stub).';
+      Alert.alert('Review', msg, [{ text: 'OK', onPress: () => navigation.goBack() }]);
     } finally {
       setBusy(false);
     }
@@ -50,9 +50,15 @@ export function PaymentApprovalScreen({ navigation, route }: Props) {
     <View style={[styles.wrap, { backgroundColor: colors.background }]}>
       <Card>
         <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-        <Text style={[styles.cost, { color: colors.text }]}>
-          {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amountUsd)}
-        </Text>
+        {amountUsd != null ? (
+          <Text style={[styles.cost, { color: colors.text }]}>
+            {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amountUsd)}
+          </Text>
+        ) : (
+          <Text style={[styles.costNote, { color: colors.textSecondary }]}>
+            Final fare and taxes appear in your approved booking tool — confirm there before expenses.
+          </Text>
+        )}
         <Text style={[styles.policyCopy, { color: colors.textSecondary }]}>
           {policyLabel(policyState)} · {policyHeadline}
         </Text>
@@ -61,8 +67,8 @@ export function PaymentApprovalScreen({ navigation, route }: Props) {
         </View>
         <Text style={[styles.hint, { color: colors.textMuted }]}>
           {policyState === 'within_policy'
-            ? 'This confirmation is within typical policy (mock).'
-            : 'Use alternatives or request approval — no charges are made in this prototype.'}
+            ? 'This screen is a frontend stub — no charges or real approvals occur here.'
+            : 'Use alternatives or request approval through your official workflow. This build does not transmit payments.'}
         </Text>
       </Card>
 
@@ -71,7 +77,7 @@ export function PaymentApprovalScreen({ navigation, route }: Props) {
         <SecondaryButton
           title="Request approval"
           onPress={() =>
-            Alert.alert('Request sent', 'Your manager will be notified (mock).', [
+            Alert.alert('Request sent', 'Your approver will be notified in the real system (stub).', [
               { text: 'OK', onPress: () => navigation.goBack() },
             ])
           }
@@ -90,6 +96,7 @@ const styles = StyleSheet.create({
   wrap: { flex: 1, padding: spacing.md, gap: spacing.lg },
   title: { fontSize: 20, fontWeight: '700' },
   cost: { fontSize: 28, fontWeight: '700', marginTop: spacing.sm },
+  costNote: { fontSize: 16, lineHeight: 24, marginTop: spacing.sm, fontWeight: '500' },
   policyCopy: { fontSize: 15, lineHeight: 22, marginTop: spacing.md },
   badgeRow: { marginTop: spacing.md },
   hint: { fontSize: 13, lineHeight: 18, marginTop: spacing.sm },

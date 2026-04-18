@@ -25,10 +25,10 @@ export function ItemDetailScreen({ navigation, route }: Props) {
     );
   }
 
-  const openPayment = (title: string, amountUsd: number) => {
+  const openPayment = (title: string) => {
     navigation.navigate('PaymentApproval', {
       title,
-      amountUsd,
+      amountUsd: null,
       policyState: item.policyState,
       itineraryItemId: item.id,
     });
@@ -42,9 +42,9 @@ export function ItemDetailScreen({ navigation, route }: Props) {
     >
       <DetailView
         item={item}
-        onModify={() => openPayment('Modify booking', Math.max(item.spendAmount, 120))}
-        onReplace={() => openPayment('Replace option', item.spendAmount + 45)}
-        onAlternatives={() => openPayment('Alternative options', item.spendAmount - 30)}
+        onModify={() => openPayment('Modify booking')}
+        onReplace={() => openPayment('Replace option')}
+        onAlternatives={() => openPayment('Alternative options')}
       />
     </ScrollView>
   );

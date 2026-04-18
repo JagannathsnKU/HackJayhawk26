@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
+import type { BudgetSnapshot } from '../models/types';
 import { useAppState } from '../context/AppProvider';
 import { spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
@@ -13,7 +14,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Expenses'>;
 export function ExpensesScreen({}: Props) {
   const colors = useAppTheme();
   const { services, trip } = useAppState();
-  const [budget, setBudget] = useState<{ dailyLimitUsd: number; spentTodayUsd: number } | null>(null);
+  const [budget, setBudget] = useState<BudgetSnapshot | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -27,20 +28,29 @@ export function ExpensesScreen({}: Props) {
       style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={styles.body}
     >
-      <SectionHeader title="Expenses" subtitle="Today’s spend vs. policy (mock)." />
+      <SectionHeader
+        title="Expenses"
+        subtitle="Illustrative until connected to Concur / card feeds. Caps come from your official policy."
+      />
       {budget && trip ? (
         <Card>
-          <ProgressBar current={budget.spentTodayUsd} max={trip.dailyBudgetUsd} label="Daily budget" />
-          <Text style={[styles.note, { color: colors.textMuted }]}>
-            Meals capped at $75/day in policy reference data. Hotel $300/night. This screen is illustrative only.
-          </Text>
+          <ProgressBar
+            current={budget.spentTodayUsd}
+            max={budget.dailyLimitUsd ?? trip.dailyBudgetUsd}
+            label="Daily budget"
+            captionFallback={budget.limitNote}
+          />
+          <Text style={[styles.note, { color: colors.textMuted }]}>{trip.budgetNote}</Text>
         </Card>
       ) : null}
 
       <Card>
-        <Text style={[styles.line, { color: colors.text }]}>Ground transport · $42</Text>
-        <Text style={[styles.line, { color: colors.text }]}>Airport lounge · $0 (membership)</Text>
-        <Text style={[styles.line, { color: colors.text }]}>Team dinner (receipt) · $128</Text>
+        <Text style={[styles.line, { color: colors.textSecondary }]}>
+          Example line items only — not your real ledger.
+        </Text>
+        <Text style={[styles.line, { color: colors.text }]}>Ground transport · receipt required if reimbursable</Text>
+        <Text style={[styles.line, { color: colors.text }]}>Meals · per policy (per-diem or itemized)</Text>
+        <Text style={[styles.line, { color: colors.text }]}>Lodging · match booking tool confirmation</Text>
       </Card>
     </ScrollView>
   );

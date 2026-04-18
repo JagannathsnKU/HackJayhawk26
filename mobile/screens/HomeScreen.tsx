@@ -25,7 +25,7 @@ export function HomeScreen({ navigation }: Props) {
           <View>
             <Text style={[styles.kicker, { color: colors.textMuted }]}>Intelligent Travel Companion</Text>
             <Text style={[styles.greet, { color: colors.text }]}>
-              {loading || !user ? 'Hello' : `Hi, ${user.displayName.split(' ')[0]}`}
+              {loading || !user ? 'Hello' : user.displayName}
             </Text>
           </View>
           <Pressable
@@ -45,6 +45,12 @@ export function HomeScreen({ navigation }: Props) {
           <Text style={{ color: colors.textSecondary, marginTop: spacing.lg }}>Preparing your trip…</Text>
         ) : (
           <>
+            {trip.demonstrationNotice ? (
+              <Card style={{ borderColor: colors.accent, borderWidth: StyleSheet.hairlineWidth }}>
+                <Text style={[styles.demo, { color: colors.textSecondary }]}>{trip.demonstrationNotice}</Text>
+              </Card>
+            ) : null}
+
             <Card style={styles.heroCard}>
               <Text style={[styles.dest, { color: colors.textMuted }]}>Current trip</Text>
               <Text style={[styles.destTitle, { color: colors.text }]}>
@@ -52,9 +58,29 @@ export function HomeScreen({ navigation }: Props) {
               </Text>
               <View style={styles.heroRow}>
                 <StatusBadge variant="trip" value={trip.health} />
-                <Text style={[styles.approved, { color: colors.success }]}>Status: Approved</Text>
+                <Text
+                  style={[
+                    styles.approved,
+                    {
+                      color:
+                        trip.approvalStatus === 'approved'
+                          ? colors.success
+                          : trip.approvalStatus === 'pending'
+                            ? colors.warning
+                            : colors.danger,
+                    },
+                  ]}
+                >
+                  Trip approval:{' '}
+                  {trip.approvalStatus === 'approved'
+                    ? 'Approved'
+                    : trip.approvalStatus === 'pending'
+                      ? 'Pending'
+                      : 'Not approved'}
+                </Text>
               </View>
               <Text style={[styles.calm, { color: colors.textSecondary }]}>{trip.healthMessage}</Text>
+              <Text style={[styles.budgetHint, { color: colors.textMuted }]}>{trip.budgetNote}</Text>
             </Card>
 
             <View style={styles.section}>
@@ -94,6 +120,17 @@ export function HomeScreen({ navigation }: Props) {
             </View>
 
             <View style={styles.section}>
+              <SecondaryButton
+                title="Travel policy (plain language)"
+                onPress={() => navigation.navigate('TravelPolicy')}
+              />
+              <SecondaryButton
+                title="During a disruption"
+                onPress={() => navigation.navigate('DisruptionGuide')}
+              />
+            </View>
+
+            <View style={styles.section}>
               <PrimaryButton title="Fix my situation" onPress={() => navigation.navigate('FixSituation')} />
             </View>
 
@@ -107,7 +144,7 @@ export function HomeScreen({ navigation }: Props) {
             </View>
 
             <Text style={[styles.footerNote, { color: colors.textMuted }]}>
-              $300/day budget · Tokyo · Mock data for prototype
+              Privacy: itinerary and spend should follow least-necessary display — see Travel policy screen.
             </Text>
           </>
         )}
@@ -147,6 +184,8 @@ const styles = StyleSheet.create({
   heroRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flexWrap: 'wrap' },
   approved: { fontSize: 13, fontWeight: '600' },
   calm: { fontSize: 15, lineHeight: 22 },
+  budgetHint: { fontSize: 13, lineHeight: 18, marginTop: spacing.sm },
+  demo: { fontSize: 13, lineHeight: 18 },
   section: { marginTop: spacing.lg, gap: spacing.sm },
   nextTitle: { fontSize: 18, fontWeight: '700' },
   nextSub: { fontSize: 15, marginTop: 4 },

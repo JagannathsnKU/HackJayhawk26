@@ -45,9 +45,13 @@ export interface TripSummary {
   healthMessage: string;
   nextActionTitle: string;
   nextActionSubtitle?: string;
-  dailyBudgetUsd: number;
+  /** When null, UI should not imply a numeric cap — use `budgetNote` and official policy. */
+  dailyBudgetUsd: number | null;
+  budgetNote: string;
   approvalStatus: 'approved' | 'pending' | 'denied';
   timelineToday: TimelineEntry[];
+  /** Shown when using sample data — never present as a real trip. */
+  demonstrationNotice?: string;
 }
 
 export interface UserProfile {
@@ -65,11 +69,17 @@ export interface PermissionSet {
 }
 
 export interface PolicyLimits {
-  hotelPerNightUsd: number;
-  mealPerDayUsd: number;
+  /** Where employees should confirm caps (intranet, Concur, handbook section). */
+  officialSourceHint: string;
+  hotelPerNightUsd: number | null;
+  mealPerDayUsd: number | null;
   defaultFlightClass: 'economy';
   businessClassRequiresApproval: boolean;
   onlyApprovedVendors: boolean;
+  hotelNote: string;
+  mealNote: string;
+  airNote: string;
+  vendorNote: string;
 }
 
 export interface PolicyCheckResult {
@@ -78,9 +88,10 @@ export interface PolicyCheckResult {
 }
 
 export interface BudgetSnapshot {
-  dailyLimitUsd: number;
+  dailyLimitUsd: number | null;
   spentTodayUsd: number;
   currency: string;
+  limitNote: string;
 }
 
 export interface PaymentAuthorizationRequest {

@@ -1,19 +1,25 @@
 import type { AssistantResolution, IssueCategory } from '../models/types';
-import { mockAssistantResolution } from '../utils/mockData';
+import { demoAssistantResolution } from '../data/demoTrip';
 
 export interface AssistantService {
   getSuggestions(issue: IssueCategory): Promise<AssistantResolution>;
   resolveIssue(issue: IssueCategory): Promise<AssistantResolution>;
 }
 
+function cloneResolution(resolution: AssistantResolution): AssistantResolution {
+  return {
+    ...resolution,
+    suggestions: resolution.suggestions.map((s) => ({ ...s })),
+  };
+}
+
 export function createMockAssistantService(): AssistantService {
-  const resolution = mockAssistantResolution();
   return {
     async getSuggestions() {
-      return { ...resolution, suggestions: resolution.suggestions.map((s) => ({ ...s })) };
+      return cloneResolution(demoAssistantResolution());
     },
     async resolveIssue() {
-      return { ...resolution, suggestions: resolution.suggestions.map((s) => ({ ...s })) };
+      return cloneResolution(demoAssistantResolution());
     },
   };
 }

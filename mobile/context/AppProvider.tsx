@@ -12,7 +12,7 @@ import {
   createMockTravelService,
 } from '../services';
 import type { AppNotification, ItineraryItem, TripSummary, UserProfile } from '../models/types';
-import { MOCK_NOTIFICATIONS } from '../utils/mockData';
+import { DEMO_NOTIFICATIONS } from '../data/demoTrip';
 
 type Services = {
   travel: TravelService;
@@ -53,7 +53,7 @@ export function AppProvider({
   const [itinerary, setItinerary] = useState<ItineraryItem[]>([]);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [notifications] = useState<AppNotification[]>(() =>
-    MOCK_NOTIFICATIONS.map((n) => ({ ...n })),
+    DEMO_NOTIFICATIONS.map((n) => ({ ...n })),
   );
   const [loading, setLoading] = useState(true);
 

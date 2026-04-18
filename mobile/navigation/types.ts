@@ -7,11 +7,13 @@ export type RootStackParamList = {
   ItemDetail: { itemId: string };
   Notifications: undefined;
   HelpInsurance: undefined;
+  TravelPolicy: undefined;
+  DisruptionGuide: undefined;
   Expenses: undefined;
   FixSituation: undefined;
   PaymentApproval: {
     title: string;
-    amountUsd: number;
+    amountUsd: number | null;
     policyState: PolicyState;
     itineraryItemId?: string;
   };

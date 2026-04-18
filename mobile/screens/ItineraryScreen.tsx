@@ -49,7 +49,7 @@ export function ItineraryScreen({ navigation }: Props) {
       ItemSeparatorComponent={() => <View style={{ height: spacing.md }} />}
       ListHeaderComponent={
         <Text style={[styles.header, { color: colors.textSecondary }]}>
-          Tap a card for policy, budget, and actions.
+          Tap an item for policy status, budget context, and next steps. Sample data only.
         </Text>
       }
     />

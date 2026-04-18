@@ -40,7 +40,7 @@ export function FixSituationScreen({ navigation }: Props) {
   const accept = (s: AssistantSuggestion) => {
     navigation.navigate('PaymentApproval', {
       title: s.title,
-      amountUsd: s.priceUsd ?? 240,
+      amountUsd: s.priceUsd ?? null,
       policyState: 'within_policy',
     });
   };
@@ -66,7 +66,10 @@ export function FixSituationScreen({ navigation }: Props) {
         </>
       ) : (
         <>
-          <SectionHeader title="Here’s a calm path forward" subtitle="Mocked assistant response." />
+          <SectionHeader
+            title="Here’s a calm path forward"
+            subtitle="Guided next steps — confirm any spend in your booking tool."
+          />
           <Card>
             <Text style={[styles.ai, { color: colors.text }]}>{message}</Text>
             {issue ? (

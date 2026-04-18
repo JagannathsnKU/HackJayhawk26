@@ -68,7 +68,7 @@ export function DetailView({ item, onModify, onReplace, onAlternatives }: Props)
 
       {item.spendAmount > 0 ? (
         <Text style={[styles.footnote, { color: colors.textMuted }]}>
-          Est. {currency(item.spendAmount)} — limits are indicative for this prototype.
+          Est. {currency(item.spendAmount)} — confirm final amounts in your booking tool and expense system.
         </Text>
       ) : null}
     </View>

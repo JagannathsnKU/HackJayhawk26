@@ -1,5 +1,5 @@
 import type { ItineraryItem, TripSummary } from '../models/types';
-import { MOCK_ITINERARY, MOCK_TRIP } from '../utils/mockData';
+import { DEMO_ITINERARY, DEMO_TRIP } from '../data/demoTrip';
 
 export interface TravelService {
   getTrip(): Promise<TripSummary>;
@@ -9,10 +9,10 @@ export interface TravelService {
 export function createMockTravelService(): TravelService {
   return {
     async getTrip() {
-      return { ...MOCK_TRIP };
+      return { ...DEMO_TRIP };
     },
     async getItinerary() {
-      return MOCK_ITINERARY.map((i) => ({ ...i }));
+      return DEMO_ITINERARY.map((i) => ({ ...i }));
     },
   };
 }

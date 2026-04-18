@@ -12,20 +12,21 @@ export interface PaymentService {
 export function createMockPaymentService(): PaymentService {
   return {
     async authorizePayment(request) {
-      // Frontend stub: deterministic mock only.
       if (request.amountUsd > 3500) {
-        return { status: 'requires_approval', reference: 'MOCK-PAY-PENDING' };
+        return { status: 'requires_approval', reference: 'PENDING-APPROVAL-STUB' };
       }
       if (request.amountUsd < 0) {
-        return { status: 'denied', reference: 'MOCK-PAY-DENY' };
+        return { status: 'denied', reference: 'DENY-STUB' };
       }
-      return { status: 'approved_auto', reference: 'MOCK-PAY-OK' };
+      return { status: 'approved_auto', reference: 'AUTO-STUB' };
     },
     async checkBudget() {
       return {
-        dailyLimitUsd: 300,
-        spentTodayUsd: 186,
+        dailyLimitUsd: null,
+        spentTodayUsd: 0,
         currency: 'USD',
+        limitNote:
+          'Daily caps come from your expense policy — this row is illustrative until connected to Concur or payroll feeds.',
       };
     },
   };

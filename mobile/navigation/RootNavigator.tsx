@@ -11,6 +11,8 @@ import { HelpInsuranceScreen } from '../screens/HelpInsuranceScreen';
 import { ExpensesScreen } from '../screens/ExpensesScreen';
 import { FixSituationScreen } from '../screens/FixSituationScreen';
 import { PaymentApprovalScreen } from '../screens/PaymentApprovalScreen';
+import { TravelPolicyScreen } from '../screens/TravelPolicyScreen';
+import { DisruptionGuideScreen } from '../screens/DisruptionGuideScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -51,6 +53,12 @@ export function RootNavigator() {
           name="HelpInsurance"
           component={HelpInsuranceScreen}
           options={{ title: 'Help & coverage' }}
+        />
+        <Stack.Screen name="TravelPolicy" component={TravelPolicyScreen} options={{ title: 'Travel policy' }} />
+        <Stack.Screen
+          name="DisruptionGuide"
+          component={DisruptionGuideScreen}
+          options={{ title: 'During a disruption' }}
         />
         <Stack.Screen name="Expenses" component={ExpensesScreen} options={{ title: 'Expenses' }} />
         <Stack.Screen

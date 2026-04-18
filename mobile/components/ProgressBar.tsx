@@ -5,12 +5,31 @@ import { radii, spacing, useAppTheme } from '../utils/theme';
 type Props = {
   label?: string;
   current: number;
-  max: number;
+  max: number | null;
+  /** When `max` is null, shown instead of a bar. */
+  captionFallback?: string;
 };
 
-export function ProgressBar({ label, current, max }: Props) {
+export function ProgressBar({ label, current, max, captionFallback }: Props) {
   const colors = useAppTheme();
-  const pct = max <= 0 ? 0 : Math.min(100, Math.round((current / max) * 100));
+
+  if (max == null || max <= 0) {
+    return (
+      <View style={styles.wrap}>
+        {label ? (
+          <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>
+        ) : null}
+        <Text style={[styles.caption, { color: colors.textMuted }]}>
+          {captionFallback ??
+            (current > 0
+              ? `Recorded spend today: $${current} — confirm your cap in the official policy system.`
+              : 'Connect to your expense feed to show progress against published limits.')}
+        </Text>
+      </View>
+    );
+  }
+
+  const pct = Math.min(100, Math.round((current / max) * 100));
 
   return (
     <View style={styles.wrap}>
