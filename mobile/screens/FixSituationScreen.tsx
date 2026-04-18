@@ -4,7 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import type { AssistantSuggestion, IssueCategory } from '../models/types';
 import { useAppState } from '../context/AppProvider';
-import { spacing, useAppTheme } from '../utils/theme';
+import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { SecondaryButton } from '../components/SecondaryButton';
@@ -126,7 +126,12 @@ export function FixSituationScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  body: { padding: spacing.md, paddingBottom: spacing.xl * 2, gap: spacing.md },
+  body: {
+    paddingHorizontal: screenPaddingX,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xl * 2,
+    gap: spacing.md,
+  },
   prompt: { fontSize: 15, lineHeight: 22 },
   stack: { gap: spacing.sm },
   ai: { fontSize: 16, lineHeight: 24, fontWeight: '600' },

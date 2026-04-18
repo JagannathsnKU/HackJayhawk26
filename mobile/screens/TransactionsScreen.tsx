@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { MainTabScreenProps } from '../navigation/types';
 import type { HookDecision, HookTransactionEvent } from '../models/types';
 import { useAppState } from '../context/AppProvider';
-import { radii, spacing, useAppTheme } from '../utils/theme';
+import { radii, screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
 import { SectionHeader } from '../components/SectionHeader';
 
@@ -145,7 +145,11 @@ function categoryLabel(c: HookTransactionEvent['category']): string {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  scroll: { padding: spacing.md, paddingBottom: spacing.xl * 2 },
+  scroll: {
+    paddingHorizontal: screenPaddingX,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xl * 2,
+  },
   kicker: { fontSize: 12, fontWeight: '600', letterSpacing: 0.6, textTransform: 'uppercase' },
   title: { fontSize: 26, fontWeight: '700', marginTop: 4, letterSpacing: -0.4 },
   sub: { fontSize: 15, lineHeight: 22, marginTop: spacing.sm },

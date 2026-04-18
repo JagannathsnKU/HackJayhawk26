@@ -3,7 +3,7 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { useAppState } from '../context/AppProvider';
-import { spacing, useAppTheme } from '../utils/theme';
+import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { SecondaryButton } from '../components/SecondaryButton';
@@ -87,7 +87,13 @@ export function PaymentApprovalScreen({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { flex: 1, padding: spacing.md, gap: spacing.lg },
+  wrap: {
+    flex: 1,
+    paddingHorizontal: screenPaddingX,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
+    gap: spacing.lg,
+  },
   title: { fontSize: 20, fontWeight: '700' },
   cost: { fontSize: 28, fontWeight: '700', marginTop: spacing.sm },
   policyCopy: { fontSize: 15, lineHeight: 22, marginTop: spacing.md },

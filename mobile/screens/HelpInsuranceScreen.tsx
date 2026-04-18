@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
-import { spacing, useAppTheme } from '../utils/theme';
+import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { SecondaryButton } from '../components/SecondaryButton';
@@ -76,7 +76,12 @@ export function HelpInsuranceScreen({}: Props) {
 }
 
 const styles = StyleSheet.create({
-  body: { padding: spacing.md, paddingBottom: spacing.xl * 2, gap: spacing.md },
+  body: {
+    paddingHorizontal: screenPaddingX,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xl * 2,
+    gap: spacing.md,
+  },
   covered: { fontSize: 16, fontWeight: '700' },
   coveredBody: { fontSize: 15, lineHeight: 22, marginTop: spacing.sm },
   topicList: { gap: spacing.sm },

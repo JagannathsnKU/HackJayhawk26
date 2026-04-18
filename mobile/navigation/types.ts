@@ -10,6 +10,7 @@ export type MainTabParamList = {
 };
 
 export type RootStackParamList = {
+  Welcome: undefined;
   MainTabs: undefined;
   Itinerary: undefined;
   ItemDetail: { itemId: string };

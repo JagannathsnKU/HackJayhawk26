@@ -1,6 +1,5 @@
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useColorScheme } from 'react-native';
 import { getThemeColors } from '../utils/theme';
 import type { RootStackParamList } from './types';
 import { MainTabNavigator } from './MainTabNavigator';
@@ -11,17 +10,17 @@ import { HelpInsuranceScreen } from '../screens/HelpInsuranceScreen';
 import { ExpensesScreen } from '../screens/ExpensesScreen';
 import { FixSituationScreen } from '../screens/FixSituationScreen';
 import { PaymentApprovalScreen } from '../screens/PaymentApprovalScreen';
+import { WelcomeScreen } from '../screens/WelcomeScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
-  const scheme = useColorScheme();
-  const c = getThemeColors(scheme);
+  const c = getThemeColors();
 
   const navTheme = {
-    ...(scheme === 'dark' ? DarkTheme : DefaultTheme),
+    ...DarkTheme,
     colors: {
-      ...(scheme === 'dark' ? DarkTheme.colors : DefaultTheme.colors),
+      ...DarkTheme.colors,
       primary: c.accent,
       background: c.background,
       card: c.surface,
@@ -34,7 +33,7 @@ export function RootNavigator() {
   return (
     <NavigationContainer theme={navTheme}>
       <Stack.Navigator
-        initialRouteName="MainTabs"
+        initialRouteName="Welcome"
         screenOptions={{
           headerShadowVisible: false,
           headerStyle: { backgroundColor: c.surface },
@@ -43,6 +42,7 @@ export function RootNavigator() {
           contentStyle: { backgroundColor: c.background },
         }}
       >
+        <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="MainTabs" component={MainTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="Itinerary" component={ItineraryScreen} options={{ title: 'Itinerary' }} />
         <Stack.Screen name="ItemDetail" component={ItemDetailScreen} options={{ title: 'Details' }} />

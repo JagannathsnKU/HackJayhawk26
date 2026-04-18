@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { useAppState } from '../context/AppProvider';
-import { spacing, useAppTheme } from '../utils/theme';
+import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
 import { ProgressBar } from '../components/ProgressBar';
 import { SectionHeader } from '../components/SectionHeader';
@@ -47,7 +47,12 @@ export function ExpensesScreen({}: Props) {
 }
 
 const styles = StyleSheet.create({
-  body: { padding: spacing.md, paddingBottom: spacing.xl * 2, gap: spacing.md },
+  body: {
+    paddingHorizontal: screenPaddingX,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xl * 2,
+    gap: spacing.md,
+  },
   note: { fontSize: 13, lineHeight: 18, marginTop: spacing.md },
   line: { fontSize: 15, marginBottom: spacing.sm },
 });

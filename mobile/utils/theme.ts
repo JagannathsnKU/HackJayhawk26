@@ -1,5 +1,3 @@
-import { useColorScheme } from 'react-native';
-
 export const spacing = {
   xs: 6,
   sm: 10,
@@ -7,6 +5,9 @@ export const spacing = {
   lg: 22,
   xl: 28,
 } as const;
+
+/** Horizontal inset aligned with welcome / hero for scroll screens. */
+export const screenPaddingX = 24;
 
 export const radii = {
   sm: 10,
@@ -31,43 +32,30 @@ export type ThemeColors = {
   onAccent: string;
 };
 
-const light: ThemeColors = {
-  background: '#F4F6F8',
-  surface: '#FFFFFF',
-  surfaceElevated: '#FAFBFC',
-  border: '#E2E6EA',
-  text: '#0F1720',
-  textSecondary: '#3D4F5F',
-  textMuted: '#6B7C8C',
-  accent: '#1E4D8C',
-  accentMuted: '#D6E4F5',
-  success: '#1F7A4C',
-  warning: '#B86B00',
-  danger: '#B42318',
-  onAccent: '#FFFFFF',
+/**
+ * Unified black / white / gray palette so every screen matches the landing look.
+ * System light/dark does not switch palettes — one consistent chrome.
+ */
+const monochrome: ThemeColors = {
+  background: '#000000',
+  surface: '#0a0a0a',
+  surfaceElevated: '#111111',
+  border: '#2a2a2a',
+  text: '#fafafa',
+  textSecondary: '#e5e5e5',
+  textMuted: '#a3a3a3',
+  accent: '#ffffff',
+  accentMuted: 'rgba(255, 255, 255, 0.1)',
+  success: '#86efac',
+  warning: '#fcd34d',
+  danger: '#fca5a5',
+  onAccent: '#000000',
 };
 
-const dark: ThemeColors = {
-  background: '#0C1014',
-  surface: '#141A21',
-  surfaceElevated: '#1A222C',
-  border: '#2A3440',
-  text: '#F1F5F9',
-  textSecondary: '#C7D2DD',
-  textMuted: '#8B9AAB',
-  accent: '#6BA3E8',
-  accentMuted: '#1E3A5C',
-  success: '#4ADE80',
-  warning: '#FBBF24',
-  danger: '#F87171',
-  onAccent: '#0B1220',
-};
-
-export function getThemeColors(scheme: 'light' | 'dark' | null | undefined): ThemeColors {
-  return scheme === 'dark' ? dark : light;
+export function getThemeColors(_scheme?: 'light' | 'dark' | null | undefined): ThemeColors {
+  return monochrome;
 }
 
 export function useAppTheme(): ThemeColors {
-  const scheme = useColorScheme();
-  return getThemeColors(scheme);
+  return monochrome;
 }

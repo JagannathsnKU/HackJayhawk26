@@ -4,7 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import type { AppNotification } from '../models/types';
 import { useAppState } from '../context/AppProvider';
-import { spacing, useAppTheme } from '../utils/theme';
+import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Notifications'>;
@@ -52,7 +52,11 @@ export function NotificationsScreen({}: Props) {
 }
 
 const styles = StyleSheet.create({
-  list: { padding: spacing.md, paddingBottom: spacing.xl * 2 },
+  list: {
+    paddingHorizontal: screenPaddingX,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xl * 2,
+  },
   header: { marginBottom: spacing.md, fontSize: 14, lineHeight: 20 },
   row: { flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' },
   textWrap: { flex: 1, gap: 6 },

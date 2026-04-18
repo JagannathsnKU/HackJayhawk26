@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { MainTabScreenProps } from '../navigation/types';
 import { useAppState } from '../context/AppProvider';
-import { radii, spacing, useAppTheme } from '../utils/theme';
+import { radii, screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { StatusBadge } from '../components/StatusBadge';
 import { Card } from '../components/Card';
 import { PrimaryButton } from '../components/PrimaryButton';
@@ -164,7 +164,8 @@ export function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   scroll: {
-    padding: spacing.md,
+    paddingHorizontal: screenPaddingX,
+    paddingTop: spacing.md,
     paddingBottom: spacing.xl * 2,
   },
   topRow: {

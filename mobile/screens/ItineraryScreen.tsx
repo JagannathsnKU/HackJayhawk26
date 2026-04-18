@@ -3,7 +3,7 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { useAppState } from '../context/AppProvider';
-import { spacing, useAppTheme } from '../utils/theme';
+import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
 import { StatusBadge } from '../components/StatusBadge';
 import type { ItineraryItem } from '../models/types';
@@ -70,7 +70,11 @@ function kindLabel(k: ItineraryItem['kind']) {
 }
 
 const styles = StyleSheet.create({
-  list: { padding: spacing.md, paddingBottom: spacing.xl * 2 },
+  list: {
+    paddingHorizontal: screenPaddingX,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xl * 2,
+  },
   header: { marginBottom: spacing.md, fontSize: 14, lineHeight: 20 },
   card: { gap: 6 },
   cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },

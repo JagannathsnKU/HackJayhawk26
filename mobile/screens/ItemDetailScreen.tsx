@@ -4,7 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { findItineraryItem } from '../navigation/types';
 import { useAppState } from '../context/AppProvider';
-import { spacing, useAppTheme } from '../utils/theme';
+import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { DetailView } from '../components/DetailView';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ItemDetail'>;
@@ -51,6 +51,10 @@ export function ItemDetailScreen({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  body: { padding: spacing.md, paddingBottom: spacing.xl * 2 },
+  body: {
+    paddingHorizontal: screenPaddingX,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xl * 2,
+  },
   fallback: { flex: 1 },
 });

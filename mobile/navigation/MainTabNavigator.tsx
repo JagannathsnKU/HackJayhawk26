@@ -1,5 +1,4 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useColorScheme } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getThemeColors } from '../utils/theme';
 import type { MainTabParamList } from './types';
@@ -10,8 +9,7 @@ import { TransactionsScreen } from '../screens/TransactionsScreen';
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export function MainTabNavigator() {
-  const scheme = useColorScheme();
-  const c = getThemeColors(scheme);
+  const c = getThemeColors();
 
   return (
     <Tab.Navigator
