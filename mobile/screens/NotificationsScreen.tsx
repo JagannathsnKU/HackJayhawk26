@@ -21,6 +21,13 @@ export function NotificationsScreen({}: Props) {
       ]}
     >
       <View style={styles.textWrap}>
+        {item.agent ? (
+          <View style={[styles.agentTag, { backgroundColor: colors.accentMuted }]}>
+            <Text style={[styles.agentTagText, { color: colors.accent }]}>
+              {item.agent === 'scout' ? 'Scout · Agent A' : 'Treasurer · Agent B'}
+            </Text>
+          </View>
+        ) : null}
         <Text style={[styles.title, { color: colors.text }]}>{item.title}</Text>
         <Text style={[styles.body, { color: colors.textSecondary }]}>{item.body}</Text>
       </View>
@@ -48,7 +55,9 @@ const styles = StyleSheet.create({
   list: { padding: spacing.md, paddingBottom: spacing.xl * 2 },
   header: { marginBottom: spacing.md, fontSize: 14, lineHeight: 20 },
   row: { flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' },
-  textWrap: { flex: 1, gap: 4 },
+  textWrap: { flex: 1, gap: 6 },
+  agentTag: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999 },
+  agentTagText: { fontSize: 10, fontWeight: '700', letterSpacing: 0.3, textTransform: 'uppercase' },
   title: { fontSize: 16, fontWeight: '700' },
   body: { fontSize: 14, lineHeight: 20 },
   time: { fontSize: 12, fontWeight: '600' },

@@ -111,12 +111,41 @@ export interface AssistantResolution {
 
 export type IssueCategory = 'flight' | 'hotel' | 'general';
 
+/** Agent A (Scout) vs Agent B (Treasurer) — surfaced on Home and Updates. */
+export type AgentKind = 'scout' | 'treasurer';
+
 export interface AppNotification {
   id: string;
   title: string;
   body: string;
   timeLabel: string;
   read: boolean;
+  /** When set, grouped under Companion updates / labeled in Updates. */
+  agent?: AgentKind;
+}
+
+/** Mock XRPL / identity + balances for Profile & demos. */
+export interface WalletSnapshot {
+  did: string;
+  rlusdBalance: string;
+  xrpBalance: string;
+  tripEscrowUsd: string;
+  lendingVaultAvailableUsd: string;
+}
+
+export type HookDecision = 'passed' | 'blocked' | 'pending';
+
+/** Treasury hook evaluation — enforcement layer UI. */
+export interface HookTransactionEvent {
+  id: string;
+  timeLabel: string;
+  merchant: string;
+  category: 'airline' | 'hotel' | 'ground' | 'other';
+  amountUsd: number;
+  decision: HookDecision;
+  hookChecks: { id: string; label: string; ok: boolean }[];
+  companionAuthorized: boolean;
+  reference?: string;
 }
 
 export interface HelpTopic {

@@ -1,8 +1,10 @@
 import type {
   AppNotification,
   AssistantResolution,
+  HookTransactionEvent,
   ItineraryItem,
   TripSummary,
+  WalletSnapshot,
 } from '../models/types';
 
 export const MOCK_TRIP: TripSummary = {
@@ -118,6 +120,23 @@ export const MOCK_NOTIFICATIONS: AppNotification[] = [
     body: 'ANA 107 now departs from Gate B12.',
     timeLabel: '12 min ago',
     read: false,
+    agent: 'scout',
+  },
+  {
+    id: 'a-scout-1',
+    title: 'Geopolitical advisory (Tokyo)',
+    body: 'No new travel restrictions for your corridor; monitor Haneda ground ops at peak hours.',
+    timeLabel: '18 min ago',
+    read: false,
+    agent: 'scout',
+  },
+  {
+    id: 'a-treas-1',
+    title: 'FX: JPY favorable vs yesterday',
+    body: 'Swapping 200 RLUSD → JPY via native AMM now saves ~1.2% vs airport desk rate.',
+    timeLabel: '24 min ago',
+    read: false,
+    agent: 'treasurer',
   },
   {
     id: 'n2',
@@ -132,6 +151,85 @@ export const MOCK_NOTIFICATIONS: AppNotification[] = [
     body: 'Traffic is light — suggested departure in 8 minutes.',
     timeLabel: '2 hr ago',
     read: true,
+    agent: 'scout',
+  },
+  {
+    id: 'a-treas-2',
+    title: 'Trip escrow topped up',
+    body: 'Corporate treasury funded trip escrow (+$300 RLUSD). Hook policy active for hotel + air.',
+    timeLabel: '3 hr ago',
+    read: true,
+    agent: 'treasurer',
+  },
+];
+
+export const MOCK_WALLET: WalletSnapshot = {
+  did: 'did:xrpl:1:mainnet:rN8qJfJ7g4hK2vP9xL3mQ5wZ1cY6bT0sD4e',
+  rlusdBalance: '4,280.52',
+  xrpBalance: '1,204.33',
+  tripEscrowUsd: '300.00',
+  lendingVaultAvailableUsd: '50,000.00',
+};
+
+export const MOCK_HOOK_EVENTS: HookTransactionEvent[] = [
+  {
+    id: 'hx-1',
+    timeLabel: 'Just now',
+    merchant: 'ANA · In-flight purchase',
+    category: 'airline',
+    amountUsd: 42,
+    decision: 'passed',
+    companionAuthorized: true,
+    reference: 'HOOK-ANA-88421',
+    hookChecks: [
+      { id: 'c1', label: 'Merchant on approved airline list', ok: true },
+      { id: 'c2', label: 'Companion signature valid for trip NRT-001', ok: true },
+      { id: 'c3', label: 'Trip escrow ≥ spend', ok: true },
+    ],
+  },
+  {
+    id: 'hx-2',
+    timeLabel: '6 min ago',
+    merchant: 'Hotel New Otani · Deposit',
+    category: 'hotel',
+    amountUsd: 220,
+    decision: 'passed',
+    companionAuthorized: true,
+    reference: 'HOOK-HTL-22104',
+    hookChecks: [
+      { id: 'c1', label: 'Merchant is registered hotel vendor', ok: true },
+      { id: 'c2', label: 'Companion authorized for lodging', ok: true },
+      { id: 'c3', label: 'RLUSD in trip escrow', ok: true },
+    ],
+  },
+  {
+    id: 'hx-3',
+    timeLabel: 'Yesterday',
+    merchant: 'Unknown vendor · Ground transport',
+    category: 'ground',
+    amountUsd: 180,
+    decision: 'blocked',
+    companionAuthorized: true,
+    reference: 'HOOK-BLK-0092',
+    hookChecks: [
+      { id: 'c1', label: 'Merchant on approved vendor list', ok: false },
+      { id: 'c2', label: 'Companion signature valid', ok: true },
+      { id: 'c3', label: 'Escrow sufficient', ok: true },
+    ],
+  },
+  {
+    id: 'hx-4',
+    timeLabel: 'Pending',
+    merchant: 'Business class upgrade · JL 058',
+    category: 'airline',
+    amountUsd: 4200,
+    decision: 'pending',
+    companionAuthorized: false,
+    hookChecks: [
+      { id: 'c1', label: 'Merchant on approved airline list', ok: true },
+      { id: 'c2', label: 'Companion proof of intent (policy)', ok: false },
+      { id: 'c3', label: 'Within route cap', ok: false },
+    ],
   },
 ];
 

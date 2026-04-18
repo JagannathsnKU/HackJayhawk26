@@ -11,8 +11,15 @@ import {
   createMockPolicyService,
   createMockTravelService,
 } from '../services';
-import type { AppNotification, ItineraryItem, TripSummary, UserProfile } from '../models/types';
-import { MOCK_NOTIFICATIONS } from '../utils/mockData';
+import type {
+  AppNotification,
+  HookTransactionEvent,
+  ItineraryItem,
+  TripSummary,
+  UserProfile,
+  WalletSnapshot,
+} from '../models/types';
+import { MOCK_HOOK_EVENTS, MOCK_NOTIFICATIONS, MOCK_WALLET } from '../utils/mockData';
 
 type Services = {
   travel: TravelService;
@@ -28,6 +35,8 @@ type AppState = {
   itinerary: ItineraryItem[];
   user: UserProfile | null;
   notifications: AppNotification[];
+  wallet: WalletSnapshot;
+  hookEvents: HookTransactionEvent[];
   loading: boolean;
   refresh: () => Promise<void>;
 };
@@ -55,6 +64,8 @@ export function AppProvider({
   const [notifications] = useState<AppNotification[]>(() =>
     MOCK_NOTIFICATIONS.map((n) => ({ ...n })),
   );
+  const [wallet] = useState<WalletSnapshot>(() => ({ ...MOCK_WALLET }));
+  const [hookEvents] = useState<HookTransactionEvent[]>(() => MOCK_HOOK_EVENTS.map((h) => ({ ...h })));
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
@@ -84,10 +95,12 @@ export function AppProvider({
       itinerary,
       user,
       notifications,
+      wallet,
+      hookEvents,
       loading,
       refresh,
     }),
-    [services, trip, itinerary, user, notifications, loading, refresh],
+    [services, trip, itinerary, user, notifications, wallet, hookEvents, loading, refresh],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useColorScheme } from 'react-native';
 import { getThemeColors } from '../utils/theme';
 import type { RootStackParamList } from './types';
-import { HomeScreen } from '../screens/HomeScreen';
+import { MainTabNavigator } from './MainTabNavigator';
 import { ItineraryScreen } from '../screens/ItineraryScreen';
 import { ItemDetailScreen } from '../screens/ItemDetailScreen';
 import { NotificationsScreen } from '../screens/NotificationsScreen';
@@ -34,7 +34,7 @@ export function RootNavigator() {
   return (
     <NavigationContainer theme={navTheme}>
       <Stack.Navigator
-        initialRouteName="Home"
+        initialRouteName="MainTabs"
         screenOptions={{
           headerShadowVisible: false,
           headerStyle: { backgroundColor: c.surface },
@@ -43,7 +43,7 @@ export function RootNavigator() {
           contentStyle: { backgroundColor: c.background },
         }}
       >
-        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="MainTabs" component={MainTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="Itinerary" component={ItineraryScreen} options={{ title: 'Itinerary' }} />
         <Stack.Screen name="ItemDetail" component={ItemDetailScreen} options={{ title: 'Details' }} />
         <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ title: 'Updates' }} />
