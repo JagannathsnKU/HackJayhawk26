@@ -8,13 +8,17 @@ import { useAppTheme } from '../../utils/theme';
 const MESH_BG = '#000000';
 const MESH_LINE = '#ffffff';
 
+const TEXT_COLOR = '#0f3d2e';
+
 export function AnomalousMatterHero({
   title = 'Welcome',
   subtitle = '',
   description = '',
+  meshRadius,
+  cameraZ,
+  fov,
 }: AnomalousMatterHeroProps) {
   const colors = useAppTheme();
-
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(10)).current;
 
@@ -27,7 +31,13 @@ export function AnomalousMatterHero({
 
   return (
     <View style={[styles.section, { backgroundColor: MESH_BG }]} accessibilityRole="header">
-      <GenerativeMeshGl meshColor={MESH_LINE} backgroundColor={MESH_BG} />
+      <GenerativeMeshGl
+        meshColor={MESH_LINE}
+        backgroundColor={MESH_BG}
+        meshRadius={meshRadius}
+        cameraZ={cameraZ}
+        fov={fov}
+      />
 
       <LinearGradient
         colors={['transparent', 'rgba(0,0,0,0.35)', MESH_BG]}
@@ -38,10 +48,10 @@ export function AnomalousMatterHero({
 
       <View style={styles.content}>
         <Animated.View style={[styles.copyBlock, { opacity, transform: [{ translateY }] }]}>
-          <Text style={[styles.kicker, { color: colors.textMuted }]}>{title}</Text>
-          <Text style={[styles.subtitle, { color: colors.text }]}>{subtitle}</Text>
+          <Text style={[styles.kicker, { color: TEXT_COLOR }]}>{title}</Text>
+          <Text style={[styles.subtitle, { color: TEXT_COLOR }]}>{subtitle}</Text>
           {description ? (
-            <Text style={[styles.body, { color: colors.textSecondary }]}>{description}</Text>
+            <Text style={[styles.body, { color: TEXT_COLOR }]}>{description}</Text>
           ) : null}
         </Animated.View>
       </View>

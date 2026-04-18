@@ -120,23 +120,23 @@ export const MOCK_NOTIFICATIONS: AppNotification[] = [
     body: 'ANA 107 now departs from Gate B12.',
     timeLabel: '12 min ago',
     read: false,
-    agent: 'scout',
+    lane: 'safety',
   },
   {
-    id: 'a-scout-1',
+    id: 'a-safety-1',
     title: 'Geopolitical advisory (Tokyo)',
     body: 'No new travel restrictions for your corridor; monitor Haneda ground ops at peak hours.',
     timeLabel: '18 min ago',
     read: false,
-    agent: 'scout',
+    lane: 'safety',
   },
   {
-    id: 'a-treas-1',
+    id: 'a-econ-1',
     title: 'FX: JPY favorable vs yesterday',
     body: 'Swapping 200 RLUSD → JPY via native AMM now saves ~1.2% vs airport desk rate.',
     timeLabel: '24 min ago',
     read: false,
-    agent: 'treasurer',
+    lane: 'economy',
   },
   {
     id: 'n2',
@@ -151,15 +151,15 @@ export const MOCK_NOTIFICATIONS: AppNotification[] = [
     body: 'Traffic is light — suggested departure in 8 minutes.',
     timeLabel: '2 hr ago',
     read: true,
-    agent: 'scout',
+    lane: 'safety',
   },
   {
-    id: 'a-treas-2',
+    id: 'a-econ-2',
     title: 'Trip escrow topped up',
     body: 'Corporate treasury funded trip escrow (+$300 RLUSD). Hook policy active for hotel + air.',
     timeLabel: '3 hr ago',
     read: true,
-    agent: 'treasurer',
+    lane: 'economy',
   },
 ];
 
@@ -183,7 +183,7 @@ export const MOCK_HOOK_EVENTS: HookTransactionEvent[] = [
     reference: 'HOOK-ANA-88421',
     hookChecks: [
       { id: 'c1', label: 'Merchant on approved airline list', ok: true },
-      { id: 'c2', label: 'Companion signature valid for trip NRT-001', ok: true },
+      { id: 'c2', label: 'Trip authorization valid for NRT-001', ok: true },
       { id: 'c3', label: 'Trip escrow ≥ spend', ok: true },
     ],
   },
@@ -198,7 +198,7 @@ export const MOCK_HOOK_EVENTS: HookTransactionEvent[] = [
     reference: 'HOOK-HTL-22104',
     hookChecks: [
       { id: 'c1', label: 'Merchant is registered hotel vendor', ok: true },
-      { id: 'c2', label: 'Companion authorized for lodging', ok: true },
+      { id: 'c2', label: 'Lodging authorized for trip', ok: true },
       { id: 'c3', label: 'RLUSD in trip escrow', ok: true },
     ],
   },
@@ -213,7 +213,7 @@ export const MOCK_HOOK_EVENTS: HookTransactionEvent[] = [
     reference: 'HOOK-BLK-0092',
     hookChecks: [
       { id: 'c1', label: 'Merchant on approved vendor list', ok: false },
-      { id: 'c2', label: 'Companion signature valid', ok: true },
+      { id: 'c2', label: 'Trip authorization valid', ok: true },
       { id: 'c3', label: 'Escrow sufficient', ok: true },
     ],
   },
@@ -227,7 +227,7 @@ export const MOCK_HOOK_EVENTS: HookTransactionEvent[] = [
     companionAuthorized: false,
     hookChecks: [
       { id: 'c1', label: 'Merchant on approved airline list', ok: true },
-      { id: 'c2', label: 'Companion proof of intent (policy)', ok: false },
+      { id: 'c2', label: 'Policy proof of intent', ok: false },
       { id: 'c3', label: 'Within route cap', ok: false },
     ],
   },

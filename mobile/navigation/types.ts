@@ -11,13 +11,15 @@ export type MainTabParamList = {
 
 export type RootStackParamList = {
   Welcome: undefined;
+  Login: undefined;
+  Register: undefined;
   MainTabs: undefined;
   Itinerary: undefined;
   ItemDetail: { itemId: string };
   Notifications: undefined;
   HelpInsurance: undefined;
   Expenses: undefined;
-  FixSituation: undefined;
+  FixSituation: { focus?: 'emergency' } | undefined;
   PaymentApproval: {
     title: string;
     amountUsd: number;

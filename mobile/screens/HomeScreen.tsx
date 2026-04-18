@@ -1,7 +1,17 @@
-import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import {
+  LayoutAnimation,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  UIManager,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { MainTabScreenProps } from '../navigation/types';
+import { companionLaneLabel } from '../models/types';
 import { useAppState } from '../context/AppProvider';
 import { radii, screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { StatusBadge } from '../components/StatusBadge';
@@ -10,13 +20,25 @@ import { PrimaryButton } from '../components/PrimaryButton';
 import { SecondaryButton } from '../components/SecondaryButton';
 import { SectionHeader } from '../components/SectionHeader';
 
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
 type Props = MainTabScreenProps<'HomeTab'>;
 
 export function HomeScreen({ navigation }: Props) {
   const colors = useAppTheme();
   const { trip, user, loading, notifications } = useAppState();
   const unread = notifications.filter((n) => !n.read).length;
-  const companionUpdates = notifications.filter((n) => n.agent);
+  const insightUpdates = notifications.filter((n) => n.lane);
+  const [dayExpanded, setDayExpanded] = useState(false);
+
+  const toggleDay = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setDayExpanded((v) => !v);
+  };
+
+  const visibleTimeline = dayExpanded ? trip?.timelineToday ?? [] : trip?.timelineToday.slice(0, 2) ?? [];
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
@@ -59,46 +81,49 @@ export function HomeScreen({ navigation }: Props) {
 
             <View style={styles.section}>
               <SectionHeader
-                title="Companion updates"
-                subtitle="Agent A (Scout): disruptions & risk. Agent B (Treasurer): FX & escrow."
+                title="Trip insights"
+                subtitle="Swipe for Safety and Spend highlights — full grid lives in Updates."
               />
-              <Card padded={false}>
-                {companionUpdates.length === 0 ? (
-                  <Text style={[styles.agentEmpty, { color: colors.textSecondary, padding: spacing.md }]}>
-                    No agent updates yet.
-                  </Text>
-                ) : (
-                  companionUpdates.slice(0, 5).map((n, idx) => (
-                    <View
+              {insightUpdates.length === 0 ? (
+                <Card>
+                  <Text style={[styles.insightEmpty, { color: colors.textSecondary }]}>No insights yet.</Text>
+                </Card>
+              ) : (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.insightCarousel}
+                  decelerationRate="fast"
+                >
+                  {insightUpdates.slice(0, 8).map((n) => (
+                    <Pressable
                       key={n.id}
-                      style={[
-                        styles.agentRow,
-                        idx < Math.min(companionUpdates.length, 5) - 1 && {
-                          borderBottomWidth: StyleSheet.hairlineWidth,
-                          borderBottomColor: colors.border,
-                        },
-                      ]}
+                      onPress={() => navigation.navigate('Notifications')}
+                      style={[styles.insightCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                      accessibilityRole="button"
                     >
-                      <View style={[styles.agentPill, { backgroundColor: colors.accentMuted }]}>
-                        <Text style={[styles.agentPillText, { color: colors.accent }]}>
-                          {n.agent === 'scout' ? 'Scout' : 'Treasurer'}
+                      <View style={[styles.insightPill, { backgroundColor: colors.accentMuted }]}>
+                        <Text style={[styles.insightPillText, { color: colors.accent }]}>
+                          {n.lane ? companionLaneLabel(n.lane) : ''}
                         </Text>
                       </View>
-                      <View style={styles.agentBody}>
-                        <Text style={[styles.agentTitle, { color: colors.text }]}>{n.title}</Text>
-                        <Text style={[styles.agentBodyText, { color: colors.textSecondary }]}>{n.body}</Text>
-                        <Text style={[styles.agentTime, { color: colors.textMuted }]}>{n.timeLabel}</Text>
-                      </View>
-                    </View>
-                  ))
-                )}
-              </Card>
+                      <Text style={[styles.insightCardTitle, { color: colors.text }]} numberOfLines={2}>
+                        {n.title}
+                      </Text>
+                      <Text style={[styles.insightCardBody, { color: colors.textSecondary }]} numberOfLines={3}>
+                        {n.body}
+                      </Text>
+                      <Text style={[styles.insightTime, { color: colors.textMuted }]}>{n.timeLabel}</Text>
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              )}
               <Pressable
                 onPress={() => navigation.navigate('Notifications')}
                 style={styles.seeAll}
                 accessibilityRole="button"
               >
-                <Text style={[styles.seeAllText, { color: colors.accent }]}>See all updates</Text>
+                <Text style={[styles.seeAllText, { color: colors.accent }]}>Open updates mosaic</Text>
               </Pressable>
             </View>
 
@@ -113,14 +138,14 @@ export function HomeScreen({ navigation }: Props) {
             </View>
 
             <View style={styles.section}>
-              <SectionHeader title="Today" subtitle="Timeline for the day." />
+              <SectionHeader title="Today" subtitle="Peek at the next steps — expand for the full run of day." />
               <Card padded={false}>
-                {trip.timelineToday.map((e, idx) => (
+                {visibleTimeline.map((e, idx) => (
                   <View
                     key={e.id}
                     style={[
                       styles.timelineRow,
-                      idx < trip.timelineToday.length - 1 && {
+                      idx < visibleTimeline.length - 1 && {
                         borderBottomWidth: StyleSheet.hairlineWidth,
                         borderBottomColor: colors.border,
                       },
@@ -136,9 +161,20 @@ export function HomeScreen({ navigation }: Props) {
                   </View>
                 ))}
               </Card>
+              {(trip.timelineToday.length ?? 0) > 2 ? (
+                <Pressable onPress={toggleDay} style={styles.expandDay} accessibilityRole="button">
+                  <Text style={[styles.expandDayText, { color: colors.accent }]}>
+                    {dayExpanded ? 'Show less' : `Show full day (${trip.timelineToday.length} stops)`}
+                  </Text>
+                </Pressable>
+              ) : null}
             </View>
 
             <View style={styles.section}>
+              <SectionHeader
+                title="Travel help"
+                subtitle="Everyday fixes and a path if you’re stranded."
+              />
               <PrimaryButton title="Fix my situation" onPress={() => navigation.navigate('FixSituation')} />
             </View>
 
@@ -203,19 +239,31 @@ const styles = StyleSheet.create({
   tSub: { fontSize: 14, lineHeight: 20 },
   quickGrid: { gap: spacing.sm },
   footerNote: { marginTop: spacing.xl, fontSize: 12, textAlign: 'center' },
-  agentRow: { flexDirection: 'row', gap: spacing.md, paddingHorizontal: spacing.md, paddingVertical: spacing.md },
-  agentPill: {
+  insightCarousel: { gap: spacing.sm, paddingVertical: 4 },
+  insightCard: {
+    width: 260,
+    borderRadius: radii.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    padding: spacing.md,
+    gap: spacing.sm,
+  },
+  insightCardTitle: { fontSize: 16, fontWeight: '700' },
+  insightCardBody: { fontSize: 14, lineHeight: 20 },
+  insightPill: {
     alignSelf: 'flex-start',
     paddingHorizontal: spacing.sm,
     paddingVertical: 4,
     borderRadius: radii.pill,
   },
-  agentPillText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.3, textTransform: 'uppercase' },
-  agentBody: { flex: 1, gap: 4 },
-  agentTitle: { fontSize: 16, fontWeight: '700' },
-  agentBodyText: { fontSize: 14, lineHeight: 20 },
-  agentTime: { fontSize: 12, fontWeight: '600' },
-  agentEmpty: { fontSize: 15, lineHeight: 22 },
+  insightPillText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.3, textTransform: 'uppercase' },
+  insightTime: { fontSize: 12, fontWeight: '600' },
+  insightEmpty: { fontSize: 15, lineHeight: 22 },
+  emergencyCard: { gap: spacing.sm },
+  emergencyKicker: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase' },
+  emergencyTitle: { fontSize: 17, fontWeight: '700' },
+  emergencyBody: { fontSize: 14, lineHeight: 22 },
   seeAll: { alignSelf: 'center', marginTop: spacing.xs, paddingVertical: spacing.sm },
   seeAllText: { fontSize: 15, fontWeight: '600' },
+  expandDay: { alignSelf: 'center', marginTop: spacing.sm, paddingVertical: spacing.sm },
+  expandDayText: { fontSize: 15, fontWeight: '600' },
 });

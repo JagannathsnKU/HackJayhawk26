@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AnomalousMatterHero } from '../components/ui/anomalous-matter-hero';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { SecondaryButton } from '../components/SecondaryButton';
 import { getThemeColors } from '../utils/theme';
 import type { RootStackScreenProps } from '../navigation/types';
 
@@ -17,16 +18,22 @@ export function WelcomeScreen({ navigation }: Props) {
       edges={['top', 'right', 'left', 'bottom']}
     >
       <View style={styles.column}>
-        <View style={styles.heroSlot}>
+        <View style={[styles.heroSlot]}>
           <AnomalousMatterHero
             title="HackJayhawk"
             subtitle="Intelligent Travel Companion"
-            description="Trip guardrails and companion agents in one place."
+            description="Trip guardrails, policy, and smart travel tools in one place."
+            meshRadius={0.68}
+            cameraZ={5.1}
+            fov={48}
           />
         </View>
         <View style={[styles.footer, { backgroundColor: colors.background }]}>
           <View style={styles.buttonWrap}>
-            <PrimaryButton title="Enter the app" onPress={() => navigation.replace('MainTabs')} />
+            <PrimaryButton title="Sign in" onPress={() => navigation.navigate('Login')} />
+            <View style={styles.secondaryWrap}>
+              <SecondaryButton title="Create account" onPress={() => navigation.navigate('Register')} />
+            </View>
           </View>
         </View>
       </View>
@@ -46,7 +53,7 @@ const styles = StyleSheet.create({
   heroSlot: {
     flex: 1,
     minHeight: 0,
-    width: '100%',
+    width: '100%'
   },
   footer: {
     paddingHorizontal: 24,
@@ -58,5 +65,9 @@ const styles = StyleSheet.create({
   },
   buttonWrap: {
     width: '100%',
+  },
+  secondaryWrap: {
+    width: '100%',
+    marginTop: 12,
   },
 });

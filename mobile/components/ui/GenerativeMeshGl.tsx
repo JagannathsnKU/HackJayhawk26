@@ -11,11 +11,20 @@ type Props = {
   meshColor?: THREE.ColorRepresentation;
   /** Clear / background color (default black). */
   backgroundColor?: THREE.ColorRepresentation;
+  /** Icosahedron radius — lower = smaller orb on screen (default tuned for welcome). */
+  meshRadius?: number;
+  /** Camera distance — higher = smaller apparent size. */
+  cameraZ?: number;
+  /** Vertical field of view in degrees — lower = less peripheral fill. */
+  fov?: number;
 };
 
 export function GenerativeMeshGl({
   meshColor = '#ffffff',
   backgroundColor = '#000000',
+  meshRadius = 1.2,
+  cameraZ = 3,
+  fov = 75,
 }: Props) {
   const teardownRef = useRef<(() => void) | null>(null);
 
@@ -47,10 +56,10 @@ export function GenerativeMeshGl({
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(backgroundColor);
 
-      const camera = new THREE.PerspectiveCamera(75, w / Math.max(h, 1), 0.1, 1000);
-      camera.position.z = 3;
+      const camera = new THREE.PerspectiveCamera(fov, w / Math.max(h, 1), 0.1, 1000);
+      camera.position.z = cameraZ;
 
-      const geometry = new THREE.IcosahedronGeometry(1.2, 64);
+      const geometry = new THREE.IcosahedronGeometry(meshRadius, 64);
       const material = new THREE.ShaderMaterial({
         uniforms: {
           time: { value: 0 },
@@ -86,7 +95,7 @@ export function GenerativeMeshGl({
         renderer.dispose();
       };
     },
-    [meshColor, backgroundColor],
+    [meshColor, backgroundColor, meshRadius, cameraZ, fov],
   );
 
   return (

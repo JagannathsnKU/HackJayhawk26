@@ -36,26 +36,26 @@ export type ThemeColors = {
  * Unified black / white / gray palette so every screen matches the landing look.
  * System light/dark does not switch palettes — one consistent chrome.
  */
-const monochrome: ThemeColors = {
+const forestTheme: ThemeColors = {
   background: '#000000',
-  surface: '#0a0a0a',
-  surfaceElevated: '#111111',
-  border: '#2a2a2a',
-  text: '#fafafa',
-  textSecondary: '#e5e5e5',
-  textMuted: '#a3a3a3',
-  accent: '#ffffff',
-  accentMuted: 'rgba(255, 255, 255, 0.1)',
-  success: '#86efac',
-  warning: '#fcd34d',
-  danger: '#fca5a5',
+  surface: '#0A0A0A',
+  surfaceElevated: '#151515',
+  border: '#2A2A2A',
+  text: '#FFFFFF',
+  textSecondary: '#CFCFCF',
+  textMuted: '#8A8A8A',
+  accent: '#FFFFFF',
+  accentMuted: 'rgba(255, 255, 255, 0.12)',
+  success: '#BFBFBF',
+  warning: '#9A9A9A',
+  danger: '#7A7A7A',
   onAccent: '#000000',
 };
 
 export function getThemeColors(_scheme?: 'light' | 'dark' | null | undefined): ThemeColors {
-  return monochrome;
+  return forestTheme;
 }
 
 export function useAppTheme(): ThemeColors {
-  return monochrome;
+  return forestTheme;
 }

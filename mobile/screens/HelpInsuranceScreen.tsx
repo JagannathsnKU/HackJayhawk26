@@ -1,92 +1,116 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
-import { PrimaryButton } from '../components/PrimaryButton';
-import { SecondaryButton } from '../components/SecondaryButton';
+import { DrillDownModal } from '../components/DrillDownModal';
 import { SectionHeader } from '../components/SectionHeader';
+import { radii } from '../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'HelpInsurance'>;
 
 const TOPICS = [
-  { id: 'med', label: 'Medical', description: 'Injury, illness, or clinic referral' },
-  { id: 'disrupt', label: 'Travel disruption', description: 'Delays, cancellations, missed connections' },
-  { id: 'emergency', label: 'Emergency', description: 'Urgent safety or security situations' },
+  { id: 'med', label: 'Medical', description: 'Injury, illness, or clinic referral', icon: '◆' },
+  { id: 'disrupt', label: 'Disruption', description: 'Delays, cancellations, missed connections', icon: '◇' },
+  { id: 'emergency', label: 'Emergency', description: 'Urgent safety or security situations', icon: '◎' },
 ] as const;
 
 export function HelpInsuranceScreen({}: Props) {
   const colors = useAppTheme();
-  const [showTopics, setShowTopics] = useState(false);
-  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [topicId, setTopicId] = useState<string | null>(null);
+  const selected = TOPICS.find((t) => t.id === topicId);
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={styles.body}
-    >
-      <SectionHeader
-        title="You’re covered"
-        subtitle="Lockton travel protection for this trip (mock)."
-      />
-      <Card>
-        <Text style={[styles.covered, { color: colors.success }]}>You are covered</Text>
-        <Text style={[styles.coveredBody, { color: colors.textSecondary }]}>
-          Emergency medical, trip disruption, and security assistance — details will link to your policy PDF in
-          production.
-        </Text>
-      </Card>
+    <View style={[styles.root, { backgroundColor: colors.background }]}>
+      <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
+        <SectionHeader title="You’re covered" subtitle="Lockton travel protection (mock) — pick a lane." />
 
-      <PrimaryButton
-        title="I need help"
-        onPress={() => {
-          setShowTopics(true);
-          setSelectedTopic(null);
-        }}
-      />
+        <Card>
+          <Text style={[styles.covered, { color: colors.success }]}>You are covered</Text>
+          <Text style={[styles.coveredBody, { color: colors.textSecondary }]}>
+            Emergency medical, trip disruption, and security assistance — production links to your policy PDF.
+          </Text>
+        </Card>
 
-      {showTopics ? (
-        <View style={styles.topicList}>
+        <Text style={[styles.laneTitle, { color: colors.textMuted }]}>What do you need?</Text>
+        <View style={styles.laneGrid}>
           {TOPICS.map((t) => (
-            <SecondaryButton
+            <Pressable
               key={t.id}
-              title={t.label}
-              onPress={() => setSelectedTopic(t.id)}
-            />
+              onPress={() => setTopicId(t.id)}
+              style={[
+                styles.laneTile,
+                {
+                  borderColor: topicId === t.id ? colors.accent : colors.border,
+                  backgroundColor: topicId === t.id ? colors.accentMuted : colors.surface,
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityState={{ selected: topicId === t.id }}
+            >
+              <Text style={[styles.laneIcon, { color: colors.accent }]}>{t.icon}</Text>
+              <Text style={[styles.laneLabel, { color: colors.text }]}>{t.label}</Text>
+              <Text style={[styles.lanePeek, { color: colors.textMuted }]} numberOfLines={2}>
+                {t.description}
+              </Text>
+            </Pressable>
           ))}
         </View>
-      ) : null}
 
-      {TOPICS.map((t) =>
-        selectedTopic === t.id ? (
-          <Card key={`detail-${t.id}`}>
-            <Text style={[styles.topicTitle, { color: colors.text }]}>{t.label}</Text>
-            <Text style={[styles.topicBody, { color: colors.textSecondary }]}>{t.description}</Text>
-            <Text style={[styles.actionsTitle, { color: colors.text }]}>Suggested actions</Text>
-            <Text style={[styles.suggestion, { color: colors.textSecondary }]}>
-              • Call the 24/7 travel line (mock){'\n'}• Message your trip owner at Lockton{'\n'}• Save receipts for
-              any out-of-pocket costs
-            </Text>
-          </Card>
-        ) : null,
-      )}
-    </ScrollView>
+        <Text style={[styles.footer, { color: colors.textMuted }]}>
+          Tap a lane above — guidance opens in a focused panel.
+        </Text>
+      </ScrollView>
+
+      <DrillDownModal
+        visible={selected != null}
+        onClose={() => setTopicId(null)}
+        title={selected?.label ?? ''}
+        subtitle="Suggested path (mock)"
+      >
+        <Text style={[styles.modalLead, { color: colors.textSecondary }]}>{selected?.description}</Text>
+        <Text style={[styles.modalActions, { color: colors.text }]}>Suggested actions</Text>
+        <Text style={[styles.modalBody, { color: colors.textSecondary }]}>
+          • Call the 24/7 travel line (mock){'\n'}• Message your trip owner at Lockton{'\n'}• Save receipts for any
+          out-of-pocket costs
+        </Text>
+      </DrillDownModal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  root: { flex: 1, paddingTop: spacing.md },
   body: {
     paddingHorizontal: screenPaddingX,
-    paddingTop: spacing.md,
     paddingBottom: spacing.xl * 2,
     gap: spacing.md,
   },
   covered: { fontSize: 16, fontWeight: '700' },
   coveredBody: { fontSize: 15, lineHeight: 22, marginTop: spacing.sm },
-  topicList: { gap: spacing.sm },
-  topicTitle: { fontSize: 18, fontWeight: '700' },
-  topicBody: { fontSize: 15, lineHeight: 22, marginTop: spacing.sm },
-  actionsTitle: { fontSize: 14, fontWeight: '700', marginTop: spacing.md },
-  suggestion: { fontSize: 14, lineHeight: 22, marginTop: spacing.sm },
+  laneTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    marginTop: spacing.sm,
+  },
+  laneGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  laneTile: {
+    width: '31%',
+    flexGrow: 1,
+    minWidth: 100,
+    borderRadius: radii.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    padding: spacing.sm,
+    gap: 6,
+  },
+  laneIcon: { fontSize: 20, fontWeight: '600' },
+  laneLabel: { fontSize: 15, fontWeight: '700' },
+  lanePeek: { fontSize: 12, lineHeight: 16 },
+  footer: { fontSize: 12, lineHeight: 18, textAlign: 'center', marginTop: spacing.sm },
+  modalLead: { fontSize: 16, lineHeight: 24, marginBottom: spacing.md },
+  modalActions: { fontSize: 14, fontWeight: '700', marginBottom: spacing.sm },
+  modalBody: { fontSize: 15, lineHeight: 24 },
 });

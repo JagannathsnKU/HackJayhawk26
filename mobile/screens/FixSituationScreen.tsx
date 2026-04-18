@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import type { AssistantSuggestion, IssueCategory } from '../models/types';
@@ -17,6 +17,7 @@ type Step = 'choose' | 'suggestions';
 export function FixSituationScreen({ navigation }: Props) {
   const colors = useAppTheme();
   const { services } = useAppState();
+
   const [step, setStep] = useState<Step>('choose');
   const [issue, setIssue] = useState<IssueCategory | null>(null);
   const [message, setMessage] = useState<string>('');
@@ -46,10 +47,7 @@ export function FixSituationScreen({ navigation }: Props) {
   };
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={styles.body}
-    >
+    <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={styles.body}>
       {step === 'choose' ? (
         <>
           <SectionHeader title="What’s wrong?" subtitle="Pick one — we’ll handle the rest." />
@@ -58,39 +56,101 @@ export function FixSituationScreen({ navigation }: Props) {
               No need to explain everything. Choose the closest match.
             </Text>
           </Card>
-          <View style={styles.stack}>
-            <SecondaryButton title="Flight issue" onPress={() => void startResolution('flight')} />
-            <SecondaryButton title="Hotel issue" onPress={() => void startResolution('hotel')} />
-            <SecondaryButton title="General confusion" onPress={() => void startResolution('general')} />
+
+          <View style={styles.issueGrid}>
+            <Pressable
+              onPress={() => void startResolution('flight')}
+              style={({ pressed }) => [
+                styles.issueTile,
+                { borderColor: colors.border, backgroundColor: colors.surface, opacity: pressed ? 0.85 : 1 },
+              ]}
+            >
+              <Text style={[styles.issueGlyph, { color: colors.accent }]}>✈</Text>
+              <Text style={[styles.issueLabel, { color: colors.text }]}>Flight</Text>
+              <Text style={[styles.issueSub, { color: colors.textMuted }]}>Delays, seats, rebooking</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => void startResolution('hotel')}
+              style={({ pressed }) => [
+                styles.issueTile,
+                { borderColor: colors.border, backgroundColor: colors.surface, opacity: pressed ? 0.85 : 1 },
+              ]}
+            >
+              <Text style={[styles.issueGlyph, { color: colors.accent }]}>⌂</Text>
+              <Text style={[styles.issueLabel, { color: colors.text }]}>Hotel</Text>
+              <Text style={[styles.issueSub, { color: colors.textMuted }]}>Check-in, room, billing</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => void startResolution('general')}
+              style={({ pressed }) => [
+                styles.issueTile,
+                { borderColor: colors.border, backgroundColor: colors.surface, opacity: pressed ? 0.85 : 1 },
+              ]}
+            >
+              <Text style={[styles.issueGlyph, { color: colors.accent }]}>?</Text>
+              <Text style={[styles.issueLabel, { color: colors.text }]}>Something else</Text>
+              <Text style={[styles.issueSub, { color: colors.textMuted }]}>Policy, receipts, routing</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => void startResolution('emergency')}
+              style={({ pressed }) => [
+                styles.issueTile,
+                { borderColor: colors.border, backgroundColor: colors.surface, opacity: pressed ? 0.85 : 1 },
+              ]}
+            >
+              <Text style={[styles.issueGlyph, { color: colors.accent }]}>!</Text>
+              <Text style={[styles.issueLabel, { color: colors.text }]}>Emergency</Text>
+              <Text style={[styles.issueSub, { color: colors.textMuted }]}>Vault draw access</Text>
+            </Pressable>
           </View>
         </>
       ) : (
         <>
           <SectionHeader title="Here’s a calm path forward" subtitle="Mocked assistant response." />
+
           <Card>
             <Text style={[styles.ai, { color: colors.text }]}>{message}</Text>
-            {issue ? (
-              <Text style={[styles.issueTag, { color: colors.textMuted }]}>
-                Context:{' '}
-                {issue === 'flight' ? 'Flight' : issue === 'hotel' ? 'Hotel' : 'General'}
-              </Text>
+
+            {issue === 'emergency' ? (
+              <Card style={styles.emergencyBlock}>
+                <Text style={[styles.emergencyEyebrow, { color: colors.textMuted }]}>Emergency · Vault Access</Text>
+                <Text style={[styles.emergencyHeadline, { color: colors.text }]}>
+                  Short-term Flash Borrow (XLS-66)
+                </Text>
+                <Text style={[styles.emergencyCopy, { color: colors.textSecondary }]}>
+                  If you are stranded or out of funds, the system can request a temporary on-chain liquidity advance.
+                  Funds are released only after a travel-risk and intent check are verified.
+                </Text>
+                <PrimaryButton
+                  title="Simulate vault draw"
+                  onPress={() =>
+                    Alert.alert(
+                      'Demo',
+                      'A vault draw would be executed with policy checks and auto-repayment on settlement.',
+                    )
+                  }
+                />
+              </Card>
             ) : null}
           </Card>
 
-          <View style={styles.optionList}>
-            {options.map((s) => (
-              <Card key={s.id} style={styles.optionCard}>
-                <Text style={[styles.optTitle, { color: colors.text }]}>{s.title}</Text>
-                <Text style={[styles.optBody, { color: colors.textSecondary }]}>{s.summary}</Text>
-                <View style={styles.optRow}>
-                  <PrimaryButton title="Accept" onPress={() => accept(s)} />
-                  <SecondaryButton title="Compare" onPress={() => setCompareVisible(true)} />
-                </View>
-              </Card>
-            ))}
-          </View>
-
-          <SecondaryButton title="Cancel" onPress={() => navigation.goBack()} />
+          {issue !== 'emergency' ? (
+            <View style={styles.optionList}>
+              {options.map((s) => (
+                <Card key={s.id} style={styles.optionCard}>
+                  <Text style={[styles.optTitle, { color: colors.text }]}>{s.title}</Text>
+                  <Text style={[styles.optBody, { color: colors.textSecondary }]}>{s.summary}</Text>
+                  <View style={styles.optRow}>
+                    <PrimaryButton title="Accept" onPress={() => accept(s)} />
+                    <SecondaryButton title="Compare" onPress={() => setCompareVisible(true)} />
+                  </View>
+                </Card>
+              ))}
+            </View>
+          ) : null}
         </>
       )}
 
@@ -99,9 +159,9 @@ export function FixSituationScreen({ navigation }: Props) {
           <View style={[styles.modalCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Text style={[styles.modalTitle, { color: colors.text }]}>Compare (mock)</Text>
             <Text style={[styles.modalBody, { color: colors.textSecondary }]}>
-              Side-by-side comparison will connect to live shopping later. For now, both options keep you within
-              typical limits.
+              Side-by-side comparison will connect to live shopping later.
             </Text>
+
             <View style={styles.compareCols}>
               {options.slice(0, 2).map((s) => (
                 <View key={s.id} style={[styles.col, { borderColor: colors.border }]}>
@@ -113,14 +173,13 @@ export function FixSituationScreen({ navigation }: Props) {
                 </View>
               ))}
             </View>
+
             <PrimaryButton title="Close" onPress={() => setCompareVisible(false)} />
           </View>
         </View>
       </Modal>
 
-      {busy ? (
-        <Text style={{ color: colors.textMuted, marginTop: spacing.md }}>Thinking…</Text>
-      ) : null}
+      {busy ? <Text style={{ color: colors.textMuted, marginTop: spacing.md }}>Thinking…</Text> : null}
     </ScrollView>
   );
 }
@@ -133,9 +192,23 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   prompt: { fontSize: 15, lineHeight: 22 },
-  stack: { gap: spacing.sm },
+  issueGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  issueTile: {
+    width: '48%',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 16,
+    padding: spacing.md,
+    gap: 6,
+    minHeight: 120,
+  },
+  issueGlyph: { fontSize: 28, fontWeight: '600' },
+  issueLabel: { fontSize: 17, fontWeight: '700' },
+  issueSub: { fontSize: 13, lineHeight: 18 },
+  emergencyBlock: { gap: spacing.sm, marginTop: spacing.sm },
+  emergencyEyebrow: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase' },
+  emergencyHeadline: { fontSize: 18, fontWeight: '700' },
+  emergencyCopy: { fontSize: 14, lineHeight: 20 },
   ai: { fontSize: 16, lineHeight: 24, fontWeight: '600' },
-  issueTag: { fontSize: 13, marginTop: spacing.sm },
   optionList: { gap: spacing.md },
   optionCard: { gap: spacing.sm },
   optTitle: { fontSize: 17, fontWeight: '700' },

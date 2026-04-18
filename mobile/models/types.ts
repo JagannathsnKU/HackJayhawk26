@@ -111,8 +111,17 @@ export interface AssistantResolution {
 
 export type IssueCategory = 'flight' | 'hotel' | 'general';
 
-/** Agent A (Scout) vs Agent B (Treasurer) — surfaced on Home and Updates. */
-export type AgentKind = 'scout' | 'treasurer';
+/** Lanes for categorized companion insights (no internal codenames in UI). */
+export type CompanionUpdateLane = 'safety' | 'economy';
+
+export function companionLaneLabel(lane: CompanionUpdateLane): string {
+  switch (lane) {
+    case 'safety':
+      return 'Flight Info';
+    case 'economy':
+      return 'Savings';
+  }
+}
 
 export interface AppNotification {
   id: string;
@@ -120,8 +129,8 @@ export interface AppNotification {
   body: string;
   timeLabel: string;
   read: boolean;
-  /** When set, grouped under Companion updates / labeled in Updates. */
-  agent?: AgentKind;
+  /** When set, surfaces as Safety vs Spend chips on Home / Updates. */
+  lane?: CompanionUpdateLane;
 }
 
 /** Mock XRPL / identity + balances for Profile & demos. */

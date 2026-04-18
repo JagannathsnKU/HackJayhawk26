@@ -1,7 +1,10 @@
-import { NavigationContainer, DarkTheme } from '@react-navigation/native';
+import { ActivityIndicator, View } from 'react-native';
+import { DarkTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useAuth } from '../context/AuthContext';
 import { getThemeColors } from '../utils/theme';
 import type { RootStackParamList } from './types';
+import { navigationRef } from './navigationRef';
 import { MainTabNavigator } from './MainTabNavigator';
 import { ItineraryScreen } from '../screens/ItineraryScreen';
 import { ItemDetailScreen } from '../screens/ItemDetailScreen';
@@ -11,11 +14,15 @@ import { ExpensesScreen } from '../screens/ExpensesScreen';
 import { FixSituationScreen } from '../screens/FixSituationScreen';
 import { PaymentApprovalScreen } from '../screens/PaymentApprovalScreen';
 import { WelcomeScreen } from '../screens/WelcomeScreen';
+import { LoginScreen } from '../screens/LoginScreen';
+import { RegisterScreen } from '../screens/RegisterScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
   const c = getThemeColors();
+  const { isReady, user, token } = useAuth();
+  const authenticated = Boolean(user && token);
 
   const navTheme = {
     ...DarkTheme,
@@ -30,10 +37,18 @@ export function RootNavigator() {
     },
   };
 
+  if (!isReady) {
+    return (
+      <View style={{ flex: 1, backgroundColor: c.background, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={c.accent} />
+      </View>
+    );
+  }
+
   return (
-    <NavigationContainer theme={navTheme}>
+    <NavigationContainer ref={navigationRef} theme={navTheme}>
       <Stack.Navigator
-        initialRouteName="Welcome"
+        initialRouteName={authenticated ? 'MainTabs' : 'Welcome'}
         screenOptions={{
           headerShadowVisible: false,
           headerStyle: { backgroundColor: c.surface },
@@ -43,6 +58,8 @@ export function RootNavigator() {
         }}
       >
         <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Sign in' }} />
+        <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Create account' }} />
         <Stack.Screen name="MainTabs" component={MainTabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="Itinerary" component={ItineraryScreen} options={{ title: 'Itinerary' }} />
         <Stack.Screen name="ItemDetail" component={ItemDetailScreen} options={{ title: 'Details' }} />

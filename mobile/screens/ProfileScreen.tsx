@@ -9,22 +9,42 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { CommonActions } from '@react-navigation/native';
 import type { MainTabScreenProps } from '../navigation/types';
+import { navigationRef } from '../navigation/navigationRef';
+import { useAuth } from '../context/AuthContext';
 import { useAppState } from '../context/AppProvider';
-import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
+import { radii, screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { SecondaryButton } from '../components/SecondaryButton';
 import { SectionHeader } from '../components/SectionHeader';
 
 type Props = MainTabScreenProps<'ProfileTab'>;
 
+type ModuleId = 'did' | 'info' | 'balances' | 'send';
+
+const MODULES: { id: ModuleId; label: string; hint: string }[] = [
+  { id: 'did', label: 'DID', hint: 'XLS-40 identity' },
+  { id: 'info', label: 'You', hint: 'HR profile' },
+  { id: 'balances', label: 'Ledger', hint: 'RLUSD · XRP' },
+  { id: 'send', label: 'Send', hint: 'Transfers' },
+];
+
 export function ProfileScreen({}: Props) {
   const colors = useAppTheme();
+  const { signOut, user: authUser } = useAuth();
   const { user, loading, wallet } = useAppState();
+  const [active, setActive] = useState<ModuleId>('did');
   const [sendAmount, setSendAmount] = useState('');
   const [destination, setDestination] = useState('');
-  const [token, setToken] = useState<'RLUSD' | 'XRP'>('RLUSD');
+  const [sendAsset, setSendAsset] = useState<'RLUSD' | 'XRP'>('RLUSD');
   const [sendBusy, setSendBusy] = useState(false);
+
+  const handleSignOut = useCallback(async () => {
+    await signOut();
+    navigationRef.dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'Welcome' }] }));
+  }, [signOut]);
 
   const shortDid = wallet.did.length > 24 ? `${wallet.did.slice(0, 18)}…${wallet.did.slice(-10)}` : wallet.did;
 
@@ -47,42 +67,81 @@ export function ProfileScreen({}: Props) {
       setSendBusy(false);
       Alert.alert(
         'Signed (demo)',
-        `Prepared ${token} transfer of ${sendAmount} for XRPL submission. Companion TEE would co-sign in production.`,
+        `Prepared ${sendAsset} transfer of ${sendAmount} for XRPL submission. Secure signing (TEE) would apply in production.`,
       );
       setSendAmount('');
       setDestination('');
     }, 900);
-  }, [destination, sendAmount, token]);
+  }, [destination, sendAmount, sendAsset]);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <View style={styles.top}>
         <Text style={[styles.kicker, { color: colors.textMuted }]}>Identity & treasury</Text>
         <Text style={[styles.title, { color: colors.text }]}>Profile</Text>
         <Text style={[styles.sub, { color: colors.textSecondary }]}>
-          XLS-40 DID, balances, and outbound transfers (mocked for the hackathon demo).
+          Choose a module — one surface at a time instead of one endless page.
         </Text>
+        {authUser ? (
+          <Text style={[styles.authEmail, { color: colors.textMuted }]}>App login: {authUser.email}</Text>
+        ) : null}
+      </View>
 
-        <View style={styles.section}>
-          <SectionHeader title="Decentralized ID" subtitle="W3C DID on XRPL — present proofs, not raw PII." />
+      <View style={styles.hub}>
+        {MODULES.map((m) => {
+          const on = active === m.id;
+          return (
+            <Pressable
+              key={m.id}
+              onPress={() => setActive(m.id)}
+              style={[
+                styles.hubTile,
+                {
+                  borderColor: on ? colors.accent : colors.border,
+                  backgroundColor: on ? colors.accentMuted : colors.surfaceElevated,
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityState={{ selected: on }}
+            >
+              <Text style={[styles.hubLabel, { color: on ? colors.accent : colors.text }]}>{m.label}</Text>
+              <Text style={[styles.hubHint, { color: colors.textMuted }]}>{m.hint}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <ScrollView
+        style={styles.panelScroll}
+        contentContainerStyle={styles.panelScrollInner}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <SectionHeader
+          title={MODULES.find((m) => m.id === active)?.label ?? ''}
+          subtitle={
+            active === 'did'
+              ? 'Present proofs, not raw PII.'
+              : active === 'info'
+                ? 'Corporate directory (mock).'
+                : active === 'balances'
+                  ? 'Escrow & vault headroom.'
+                  : 'Build a signed transfer intent.'
+          }
+        />
+        {active === 'did' ? (
           <Card>
-            <Text style={[styles.label, { color: colors.textMuted }]}>DID</Text>
+            <Text style={[styles.label, { color: colors.textMuted }]}>Decentralized ID</Text>
             <Text style={[styles.mono, { color: colors.text }]} selectable>
               {shortDid}
             </Text>
-            <Pressable
-              onPress={copyDid}
-              style={[styles.linkRow, { marginTop: spacing.sm }]}
-              accessibilityRole="button"
-              accessibilityLabel="Copy DID"
-            >
+            <Pressable onPress={copyDid} style={styles.linkRow} accessibilityRole="button">
               <Text style={[styles.link, { color: colors.accent }]}>Copy / verify (demo)</Text>
             </Pressable>
           </Card>
-        </View>
+        ) : null}
 
-        <View style={styles.section}>
-          <SectionHeader title="Your info" subtitle="Synced from corporate HR (mock)." />
+        {active === 'info' ? (
           <Card>
             {loading || !user ? (
               <Text style={{ color: colors.textSecondary }}>Loading…</Text>
@@ -95,10 +154,9 @@ export function ProfileScreen({}: Props) {
               </View>
             )}
           </Card>
-        </View>
+        ) : null}
 
-        <View style={styles.section}>
-          <SectionHeader title="On-ledger balances" subtitle="RLUSD, XRP, trip escrow, lending headroom." />
+        {active === 'balances' ? (
           <Card>
             <View style={styles.kv}>
               <Row label="RLUSD" value={wallet.rlusdBalance} colors={colors} emphasize />
@@ -107,30 +165,27 @@ export function ProfileScreen({}: Props) {
               <Row label="XLS-66 vault available" value={`$${wallet.lendingVaultAvailableUsd}`} colors={colors} />
             </View>
           </Card>
-        </View>
+        ) : null}
 
-        <View style={styles.section}>
-          <SectionHeader title="Send tokens" subtitle="Demo only — builds a signed intent for the ledger." />
+        {active === 'send' ? (
           <Card>
             <Text style={[styles.label, { color: colors.textMuted }]}>Token</Text>
             <View style={styles.tokenRow}>
               {(['RLUSD', 'XRP'] as const).map((t) => (
                 <Pressable
                   key={t}
-                  onPress={() => setToken(t)}
+                  onPress={() => setSendAsset(t)}
                   style={[
                     styles.tokenChip,
                     {
-                      backgroundColor: token === t ? colors.accentMuted : colors.surfaceElevated,
-                      borderColor: token === t ? colors.accent : colors.border,
+                      backgroundColor: sendAsset === t ? colors.accentMuted : colors.surfaceElevated,
+                      borderColor: sendAsset === t ? colors.accent : colors.border,
                     },
                   ]}
                   accessibilityRole="button"
-                  accessibilityState={{ selected: token === t }}
+                  accessibilityState={{ selected: sendAsset === t }}
                 >
-                  <Text style={[styles.tokenChipText, { color: token === t ? colors.accent : colors.text }]}>
-                    {t}
-                  </Text>
+                  <Text style={[styles.tokenChipText, { color: sendAsset === t ? colors.accent : colors.text }]}>{t}</Text>
                 </Pressable>
               ))}
             </View>
@@ -141,7 +196,10 @@ export function ProfileScreen({}: Props) {
               placeholder="e.g. 150"
               placeholderTextColor={colors.textMuted}
               keyboardType="decimal-pad"
-              style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.surfaceElevated }]}
+              style={[
+                styles.input,
+                { color: colors.text, borderColor: colors.border, backgroundColor: colors.surfaceElevated },
+              ]}
             />
             <Text style={[styles.label, { color: colors.textMuted, marginTop: spacing.md }]}>Destination</Text>
             <TextInput
@@ -151,16 +209,24 @@ export function ProfileScreen({}: Props) {
               placeholderTextColor={colors.textMuted}
               autoCapitalize="none"
               autoCorrect={false}
-              style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.surfaceElevated }]}
+              style={[
+                styles.input,
+                { color: colors.text, borderColor: colors.border, backgroundColor: colors.surfaceElevated },
+              ]}
             />
             <View style={{ marginTop: spacing.md }}>
               <PrimaryButton title="Prepare transfer (demo)" onPress={submitSend} loading={sendBusy} />
             </View>
           </Card>
-        </View>
+        ) : null}
+
+        <Card style={{ marginTop: spacing.md }}>
+          <SectionHeader title="App session" subtitle="JWT auth for this app — not your on-chain identity." />
+          <SecondaryButton title="Sign out" onPress={() => void handleSignOut()} />
+        </Card>
 
         <Text style={[styles.footer, { color: colors.textMuted }]}>
-          DIDTokenCreate & real signing would run against your testnet / mainnet config.
+          DIDTokenCreate & signing hook to your XRPL environment in production.
         </Text>
       </ScrollView>
     </SafeAreaView>
@@ -188,18 +254,34 @@ function Row({
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  scroll: {
-    paddingHorizontal: screenPaddingX,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xl * 2,
-  },
+  top: { paddingHorizontal: screenPaddingX, paddingTop: spacing.md },
+  panelScroll: { flex: 1 },
+  panelScrollInner: { paddingHorizontal: screenPaddingX, paddingBottom: spacing.xl * 2, gap: spacing.sm },
   kicker: { fontSize: 12, fontWeight: '600', letterSpacing: 0.6, textTransform: 'uppercase' },
   title: { fontSize: 26, fontWeight: '700', marginTop: 4, letterSpacing: -0.4 },
   sub: { fontSize: 15, lineHeight: 22, marginTop: spacing.sm },
-  section: { marginTop: spacing.lg, gap: spacing.sm },
+  authEmail: { fontSize: 13, marginTop: spacing.sm, fontWeight: '500' },
+  hub: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: screenPaddingX,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  hubTile: {
+    width: '47%',
+    borderRadius: radii.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+    gap: 4,
+  },
+  hubLabel: { fontSize: 18, fontWeight: '700' },
+  hubHint: { fontSize: 12, fontWeight: '500' },
   label: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 6 },
   mono: { fontSize: 13, lineHeight: 20 },
-  linkRow: { alignSelf: 'flex-start' },
+  linkRow: { alignSelf: 'flex-start', marginTop: spacing.sm },
   link: { fontSize: 15, fontWeight: '600' },
   kv: { gap: spacing.md },
   row: { gap: 4 },
