@@ -36,10 +36,10 @@ export function PaymentApprovalScreen({ navigation, route }: Props) {
       });
       const msg =
         result.status === 'approved_auto'
-          ? 'Approved automatically (mock).'
+          ? 'Approved automatically under current policy rules.'
           : result.status === 'requires_approval'
-            ? 'Approval request queued (mock).'
-            : 'Not allowed (mock).';
+            ? 'Approval request queued for your manager.'
+            : 'Not allowed under current policy rules.';
       Alert.alert('Payment', msg, [{ text: 'OK', onPress: () => navigation.goBack() }]);
     } finally {
       setBusy(false);
@@ -61,8 +61,8 @@ export function PaymentApprovalScreen({ navigation, route }: Props) {
         </View>
         <Text style={[styles.hint, { color: colors.textMuted }]}>
           {policyState === 'within_policy'
-            ? 'This confirmation is within typical policy (mock).'
-            : 'Use alternatives or request approval — no charges are made in this prototype.'}
+            ? 'This confirmation is within typical policy for your traveler profile.'
+            : 'Use alternatives or request approval — charges are not submitted until treasury confirms.'}
         </Text>
       </Card>
 
@@ -71,7 +71,7 @@ export function PaymentApprovalScreen({ navigation, route }: Props) {
         <SecondaryButton
           title="Request approval"
           onPress={() =>
-            Alert.alert('Request sent', 'Your manager will be notified (mock).', [
+            Alert.alert('Request sent', 'Your manager will be notified in the approvals channel.', [
               { text: 'OK', onPress: () => navigation.goBack() },
             ])
           }

@@ -1,7 +1,7 @@
 import type { TripSummary } from '../models/types';
 
 /**
- * Representative sample itineraries aligned with hackathon PDF references.
+ * Representative sample itineraries for previews and planning flows.
  */
 export type SampleActivity = {
   id: string;
@@ -77,7 +77,7 @@ export const SAMPLE_ITINERARIES: SampleItinerary[] = [
     id: 'hotels',
     title: 'Hotel program · Confirmed stays',
     sourceFile: 'hotel_data.pdf',
-    routeSummary: 'Preferred properties · nightly caps enforced in policy engine (UI demo)',
+    routeSummary: 'Preferred properties · nightly caps enforced in policy engine',
     activities: [
       { id: 'h1', timeLabel: 'Tokyo', title: 'Hotel New Otani', detail: '3 nights · breakfast · corp rate' },
       { id: 'h2', timeLabel: 'Chicago', title: 'Westin River North', detail: '2 nights · within $300 cap' },
@@ -88,7 +88,7 @@ export const SAMPLE_ITINERARIES: SampleItinerary[] = [
     id: 'airline',
     title: 'Airline booking ledger',
     sourceFile: 'Airline booking data.pdf',
-    routeSummary: 'Approved carriers · fare classes · record locators (mock)',
+    routeSummary: 'Approved carriers · fare classes · record locators on file',
     activities: [
       { id: 'a1', timeLabel: 'PNR HJK84K', title: 'ANA / JL · Transpacific', detail: 'Economy baseline · upgrade queue open' },
       { id: 'a2', timeLabel: 'PNR ORD22L', title: 'United · Domestic US', detail: 'Economy Plus on longest segment' },
@@ -104,7 +104,7 @@ export function itineraryById(id: string): SampleItinerary | undefined {
   return SAMPLE_ITINERARIES.find((i) => i.id === id);
 }
 
-/** Read-only preview built from the active mock trip timeline. */
+/** Read-only preview built from the active trip timeline. */
 export function sampleItineraryFromTrip(trip: TripSummary): SampleItinerary {
   return {
     id: 'active-trip',

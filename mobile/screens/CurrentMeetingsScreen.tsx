@@ -28,7 +28,7 @@ export function CurrentMeetingsScreen({}: Props) {
         <Text style={{ color: colors.textSecondary }}>Loading…</Text>
       ) : meetings.length === 0 ? (
         <Card>
-          <Text style={{ color: colors.textSecondary }}>No meetings on this mock trip.</Text>
+          <Text style={{ color: colors.textSecondary }}>No meetings scheduled for this trip yet.</Text>
         </Card>
       ) : (
         meetings.map((m) => (

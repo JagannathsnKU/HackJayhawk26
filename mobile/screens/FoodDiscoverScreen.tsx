@@ -112,7 +112,7 @@ export function FoodDiscoverScreen({}: Props) {
             pressableStyle={{ alignSelf: 'flex-start' }}
             innerStyle={styles.ctaInner}
           >
-            <Text style={[styles.ctaText, { color: colors.text }]}>Hold table (demo)</Text>
+            <Text style={[styles.ctaText, { color: colors.text }]}>Request table</Text>
           </LiquidGlassPressable>
         </Card>
       ))}

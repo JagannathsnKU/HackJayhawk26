@@ -95,7 +95,7 @@ export function FixSituationScreen({ navigation, route }: Props) {
       ) : (
         <>
           <View style={styles.suggestHeader}>
-            <SectionHeader title="Suggested next steps" subtitle="Demo assistant." />
+            <SectionHeader title="Suggested next steps" subtitle="Assistant suggestions for this situation." />
             <SecondaryButton title="Start over" onPress={reset} />
           </View>
 
@@ -111,11 +111,11 @@ export function FixSituationScreen({ navigation, route }: Props) {
                   Funds are released only after a travel-risk and intent check are verified.
                 </Text>
                 <PrimaryButton
-                  title="Simulate vault draw"
+                  title="Request vault draw"
                   onPress={() =>
                     Alert.alert(
-                      'Demo',
-                      'A vault draw would be executed with policy checks and auto-repayment on settlement.',
+                      'Nexus',
+                      'A vault draw would run with policy checks and auto-repayment on settlement once treasury is connected.',
                     )
                   }
                 />
@@ -143,7 +143,7 @@ export function FixSituationScreen({ navigation, route }: Props) {
       <Modal visible={compareVisible} animationType="slide" transparent>
         <View style={styles.modalBackdrop}>
           <View style={[styles.modalCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>Compare (mock)</Text>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Compare options</Text>
             <Text style={[styles.modalBody, { color: colors.textSecondary }]}>
               Side-by-side comparison will connect to live shopping later.
             </Text>

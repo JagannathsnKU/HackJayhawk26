@@ -31,7 +31,9 @@ export function TransactionsScreen({}: Props) {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <NexusBrandLine />
         <Text style={[styles.title, { color: colors.text }]}>Treasury hooks</Text>
-        <Text style={[styles.sub, { color: colors.textSecondary }]}>Tap a row for hook checks (demo).</Text>
+        <Text style={[styles.sub, { color: colors.textSecondary }]}>
+          Tap a row to review hook checks and treasury context for that event.
+        </Text>
 
         <View style={styles.filterRow}>
           {(

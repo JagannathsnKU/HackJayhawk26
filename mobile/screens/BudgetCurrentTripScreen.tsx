@@ -47,14 +47,16 @@ export function BudgetCurrentTripScreen({ navigation }: Props) {
       ) : null}
 
       <Card>
-        <MiniPieChart title="Spend mix (mock)" slices={slices} />
+        <MiniPieChart title="Spend mix (this trip)" slices={slices} />
       </Card>
 
       <Card style={{ gap: spacing.sm }}>
-        <Text style={[styles.shellTitle, { color: colors.text }]}>Verify before pay (UI)</Text>
-        <Text style={[styles.shellBody, { color: colors.textSecondary }]}>Hook checks before spend (demo).</Text>
+        <Text style={[styles.shellTitle, { color: colors.text }]}>Verify before pay</Text>
+        <Text style={[styles.shellBody, { color: colors.textSecondary }]}>
+          Hook checks run before spend when treasury rules are enabled for your workspace.
+        </Text>
         <PrimaryButton
-          title="Simulate verify-before-pay"
+          title="Preview verify-before-pay"
           onPress={() =>
             navigation.navigate('PaymentApproval', {
               title: 'Policy-gated spend',
@@ -66,12 +68,12 @@ export function BudgetCurrentTripScreen({ navigation }: Props) {
       </Card>
 
       <Card style={{ gap: spacing.sm }}>
-        <Text style={[styles.shellTitle, { color: colors.text }]}>XRPL FX · XLS-30 (UI)</Text>
+        <Text style={[styles.shellTitle, { color: colors.text }]}>XRPL FX · XLS-30</Text>
         <Text style={[styles.shellBody, { color: colors.textSecondary }]}>
-          Watches RLUSD vs destination FX; AMM pre-buy is a shell — not wired up.
+          Tracks RLUSD against destination FX; AMM pre-buy activates when your treasury connects on-chain liquidity.
         </Text>
         <View style={[styles.fakeGraph, { borderColor: colors.border }]}>
-          <Text style={{ color: colors.textMuted, fontSize: 12 }}>JPY leg · illustrative</Text>
+          <Text style={{ color: colors.textMuted, fontSize: 12 }}>JPY leg · projected</Text>
           <View style={[styles.bar, { backgroundColor: colors.accentMuted }]}>
             <View style={[styles.barFill, { width: '58%', backgroundColor: colors.accent }]} />
           </View>

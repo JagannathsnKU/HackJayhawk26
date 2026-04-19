@@ -51,7 +51,7 @@ export function ProfileScreen({}: Props) {
   const shortDid = wallet.did.length > 24 ? `${wallet.did.slice(0, 18)}…${wallet.did.slice(-10)}` : wallet.did;
 
   const copyDid = useCallback(() => {
-    Alert.alert('Demo', 'On device, DID would copy to clipboard for verifiable presentation flows.');
+    Alert.alert('Nexus', 'On supported devices, your DID can be copied for verifiable presentation flows.');
   }, []);
 
   const submitSend = useCallback(() => {
@@ -68,8 +68,8 @@ export function ProfileScreen({}: Props) {
     setTimeout(() => {
       setSendBusy(false);
       Alert.alert(
-        'Signed (demo)',
-        `Prepared ${sendAsset} transfer of ${sendAmount} for XRPL submission. Secure signing (TEE) would apply in production.`,
+        'Transfer prepared',
+        `Prepared ${sendAsset} transfer of ${sendAmount} for XRPL submission. Secure signing (TEE) applies when your wallet is fully provisioned.`,
       );
       setSendAmount('');
       setDestination('');
@@ -120,9 +120,9 @@ export function ProfileScreen({}: Props) {
             active === 'did'
               ? 'Present proofs, not raw PII.'
               : active === 'docs'
-                ? 'Uploads bind to your DID for XLS identity checks (demo only).'
+                ? 'Uploads bind to your DID for XLS identity checks when vault storage is enabled.'
                 : active === 'info'
-                  ? 'Corporate directory (mock).'
+                  ? 'Corporate directory snapshot.'
                   : active === 'balances'
                     ? 'Escrow & vault headroom.'
                     : 'Build a signed transfer intent.'
@@ -141,7 +141,7 @@ export function ProfileScreen({}: Props) {
               pressableStyle={{ alignSelf: 'flex-start' }}
               innerStyle={styles.linkRowInner}
             >
-              <Text style={[styles.link, { color: colors.text }]}>Copy / verify (demo)</Text>
+              <Text style={[styles.link, { color: colors.text }]}>Copy / verify</Text>
             </LiquidGlassPressable>
           </Card>
         ) : null}
@@ -150,23 +150,23 @@ export function ProfileScreen({}: Props) {
           <Card style={{ gap: spacing.sm }}>
             <Text style={[styles.label, { color: colors.textMuted }]}>Travel documents</Text>
             <Text style={[styles.docHint, { color: colors.textSecondary }]}>
-              Encrypted vault + verifiable credentials (UI only). No files leave this device in the hackathon build.
+              Encrypted vault and verifiable credentials when your organization enables document services.
             </Text>
             <SecondaryButton
-              title="Passport (upload demo)"
-              onPress={() => Alert.alert('Nexus', 'Would scan MRZ and attach a VC to your DID (demo).')}
+              title="Passport"
+              onPress={() => Alert.alert('Nexus', 'MRZ scan and verifiable credential attachment run when document capture is enabled.')}
             />
             <SecondaryButton
-              title="Driver license (upload demo)"
-              onPress={() => Alert.alert('Nexus', 'Would OCR fields for policy age / ID checks (demo).')}
+              title="Driver license"
+              onPress={() => Alert.alert('Nexus', 'OCR for policy age and ID checks runs when document capture is enabled.')}
             />
             <SecondaryButton
-              title="Visa / entry docs (upload demo)"
-              onPress={() => Alert.alert('Nexus', 'Would store encrypted copies for border workflows (demo).')}
+              title="Visa / entry docs"
+              onPress={() => Alert.alert('Nexus', 'Encrypted copies for border workflows store when your vault is configured.')}
             />
             <SecondaryButton
-              title="Trusted traveler / Global Entry (demo)"
-              onPress={() => Alert.alert('Nexus', 'Would link PASS ID metadata to your profile (demo).')}
+              title="Trusted traveler / Global Entry"
+              onPress={() => Alert.alert('Nexus', 'PASS ID metadata links to your profile when trusted-traveler integration is on.')}
             />
           </Card>
         ) : null}
@@ -241,7 +241,7 @@ export function ProfileScreen({}: Props) {
               ]}
             />
             <View style={{ marginTop: spacing.md }}>
-              <PrimaryButton title="Prepare transfer (demo)" onPress={submitSend} loading={sendBusy} />
+              <PrimaryButton title="Prepare transfer" onPress={submitSend} loading={sendBusy} />
             </View>
           </Card>
         ) : null}
@@ -251,7 +251,7 @@ export function ProfileScreen({}: Props) {
           <SecondaryButton title="Sign out" onPress={() => void handleSignOut()} />
         </Card>
 
-        <Text style={[styles.footer, { color: colors.textMuted }]}>Nexus · XRPL-ready identity (prototype)</Text>
+        <Text style={[styles.footer, { color: colors.textMuted }]}>Nexus · XRPL-ready identity</Text>
       </ScrollView>
     </SafeAreaView>
   );

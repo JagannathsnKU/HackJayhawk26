@@ -49,7 +49,7 @@ export function VoiceAgentFab({ accent, text, textMuted, onAccent }: VoiceAgentF
 
   const startRecording = React.useCallback(async () => {
     if (Platform.OS === 'web') {
-      setHint('Listening (visual demo on web)');
+      setHint('Listening (visual preview on web — use device for live mic)');
       return;
     }
     try {
@@ -158,7 +158,7 @@ export function VoiceAgentFab({ accent, text, textMuted, onAccent }: VoiceAgentF
 
   const simulateAgentSpeaking = React.useCallback(() => {
     simSpeakingRef.current = true;
-    setHint('Agent speaking… (demo pulse)');
+    setHint('Agent speaking… (preview pulse)');
     setTimeout(() => {
       simSpeakingRef.current = false;
       setHint('Listening…');
@@ -218,11 +218,11 @@ export function VoiceAgentFab({ accent, text, textMuted, onAccent }: VoiceAgentF
 
             <Pressable
               onPress={simulateAgentSpeaking}
-              style={[styles.demoBtn, { borderColor: accent }]}
+              style={[styles.auxBtn, { borderColor: accent }]}
               accessibilityRole="button"
-              accessibilityLabel="Simulate agent speaking animation"
+              accessibilityLabel="Preview agent speaking animation"
             >
-              <Text style={[styles.demoBtnText, { color: accent }]}>Simulate reply pulse</Text>
+              <Text style={[styles.auxBtnText, { color: accent }]}>Preview reply pulse</Text>
             </Pressable>
           </View>
         </LinearGradient>
@@ -292,14 +292,14 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 9999,
   },
-  demoBtn: {
+  auxBtn: {
     marginTop: 8,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 999,
     borderWidth: StyleSheet.hairlineWidth * 2,
   },
-  demoBtnText: {
+  auxBtnText: {
     fontSize: 14,
     fontWeight: '700',
   },

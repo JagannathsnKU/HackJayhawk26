@@ -1,15 +1,15 @@
-import { CosmicParallaxBg } from './parallax-cosmic-background';
-
 /**
- * Standalone demo (web). Use in a route or Storybook if you add one.
- * Welcome screen uses the same `CosmicParallaxBg` with Nexus copy.
+ * Standalone web UI sample. Wire into a route or Storybook if needed.
  */
-const DemoOne = () => {
+import React from 'react';
+import { Text, View } from 'react-native';
+
+const WebUiSample = () => {
   return (
-    <div className="flex h-screen w-full items-center justify-center">
-      <CosmicParallaxBg head="Nexus" text="Secured, Safe, Travel" loop />
-    </div>
+    <View style={{ padding: 24 }}>
+      <Text>Web UI sample</Text>
+    </View>
   );
 };
 
-export { DemoOne };
+export { WebUiSample };

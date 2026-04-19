@@ -11,7 +11,7 @@ type Props = {
   size?: number;
 };
 
-/** Lightweight SVG pie — values are relative (demo visualization only). */
+/** Lightweight SVG pie — values are relative for proportional display. */
 export function MiniPieChart({ title, slices, size = 140 }: Props) {
   const colors = useAppTheme();
   const total = useMemo(() => slices.reduce((s, x) => s + x.value, 0) || 1, [slices]);

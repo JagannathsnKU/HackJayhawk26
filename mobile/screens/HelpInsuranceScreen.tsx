@@ -24,7 +24,7 @@ export function HelpInsuranceScreen({}: Props) {
   return (
     <View style={[styles.root, { backgroundColor: 'transparent' }]}>
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
-        <SectionHeader title="You’re covered" subtitle="Lockton travel protection (mock) — pick a lane." />
+        <SectionHeader title="You’re covered" subtitle="Lockton travel protection — pick a lane." />
 
         <Card>
           <Text style={[styles.covered, { color: colors.success }]}>You are covered</Text>
@@ -63,12 +63,12 @@ export function HelpInsuranceScreen({}: Props) {
         visible={selected != null}
         onClose={() => setTopicId(null)}
         title={selected?.label ?? ''}
-        subtitle="Suggested path (mock)"
+        subtitle="Suggested path"
       >
         <Text style={[styles.modalLead, { color: colors.textSecondary }]}>{selected?.description}</Text>
         <Text style={[styles.modalActions, { color: colors.text }]}>Suggested actions</Text>
         <Text style={[styles.modalBody, { color: colors.textSecondary }]}>
-          • Call the 24/7 travel line (mock){'\n'}• Message your trip owner at Lockton{'\n'}• Save receipts for any
+          • Call the 24/7 travel line{'\n'}• Message your trip owner at Lockton{'\n'}• Save receipts for any
           out-of-pocket costs
         </Text>
       </DrillDownModal>

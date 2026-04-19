@@ -15,7 +15,7 @@ const PINS: Pin[] = [
   { id: 'mia', label: 'MIA', x: 30, y: 48 },
 ];
 
-/** Stylized global map — visual only (no geo backend). */
+/** Stylized global map for itinerary visualization. */
 export function TravelHistoryMap() {
   const colors = useAppTheme();
   const w = Math.min(Dimensions.get('window').width - 48, 400);

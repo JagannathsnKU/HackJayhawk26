@@ -41,7 +41,7 @@ export function BookingHubScreen({ navigation }: Props) {
       <NexusBrandLine />
       <Text style={[styles.title, { color: colors.text }]}>Booking</Text>
       <Text style={[styles.hint, { color: colors.textMuted }]}>
-        Pick outbound and return flights separately. AI pick = best price inside policy (demo).
+        Pick outbound and return flights separately. AI pick ranks the best price that still satisfies policy.
       </Text>
 
       <Text style={[styles.section, { color: colors.textMuted }]}>Flights · outbound</Text>

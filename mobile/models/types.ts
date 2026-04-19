@@ -133,7 +133,7 @@ export interface AppNotification {
   lane?: CompanionUpdateLane;
 }
 
-/** Mock XRPL / identity + balances for Profile & demos. */
+/** Sample XRPL / identity + balances for Profile and wallet views. */
 export interface WalletSnapshot {
   did: string;
   rlusdBalance: string;
