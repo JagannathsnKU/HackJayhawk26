@@ -18,6 +18,8 @@ export type RootStackParamList = {
   CurrentMeetings: undefined;
   FoodDiscover: undefined;
   TravelRouting: undefined;
+  /** Full-screen map from globe tap (see `GlobeMapTapOverlay`). */
+  GlobeMap: undefined;
   Profile: undefined;
   Transactions: undefined;
   Itinerary: undefined;

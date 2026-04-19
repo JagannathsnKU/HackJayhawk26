@@ -10,7 +10,7 @@ const PARALLAX_PER_TAB = 16;
  * Full-screen starfield + horizon (no hero copy). Sits behind the navigation tree.
  */
 export function GlobalCosmicBackdrop() {
-  const { tabIndex } = useCosmicBackdrop();
+  const { tabIndex, earthBackdropMode } = useCosmicBackdrop();
   const ambientParallaxPx = (tabIndex - 1) * PARALLAX_PER_TAB;
 
   return (
@@ -21,6 +21,7 @@ export function GlobalCosmicBackdrop() {
         loop
         showBranding={false}
         ambientParallaxPx={ambientParallaxPx}
+        earthBackdropMode={earthBackdropMode}
         className="min-h-0 min-w-0 h-full w-full"
       />
     </View>

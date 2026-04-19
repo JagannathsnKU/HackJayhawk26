@@ -1,8 +1,13 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
+/** Bottom planet: CSS gradient (Welcome) vs COBE globe WebView (all other routes). */
+export type EarthBackdropMode = 'gradient' | 'globe';
+
 type CosmicBackdropContextValue = {
   tabIndex: number;
   setTabIndex: (index: number) => void;
+  earthBackdropMode: EarthBackdropMode;
+  setEarthBackdropMode: (mode: EarthBackdropMode) => void;
 };
 
 const CosmicBackdropContext = createContext<CosmicBackdropContextValue | null>(null);
@@ -14,7 +19,15 @@ export function CosmicBackdropProvider({ children }: { children: React.ReactNode
     setTabIndexState(index);
   }, []);
 
-  const value = useMemo(() => ({ tabIndex, setTabIndex }), [tabIndex, setTabIndex]);
+  const [earthBackdropMode, setEarthBackdropModeState] = useState<EarthBackdropMode>('globe');
+  const setEarthBackdropMode = useCallback((mode: EarthBackdropMode) => {
+    setEarthBackdropModeState(mode);
+  }, []);
+
+  const value = useMemo(
+    () => ({ tabIndex, setTabIndex, earthBackdropMode, setEarthBackdropMode }),
+    [tabIndex, setTabIndex, earthBackdropMode, setEarthBackdropMode],
+  );
 
   return <CosmicBackdropContext.Provider value={value}>{children}</CosmicBackdropContext.Provider>;
 }

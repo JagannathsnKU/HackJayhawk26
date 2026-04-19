@@ -1,8 +1,10 @@
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { DarkTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
 import { GlobalCosmicBackdrop } from '../components/GlobalCosmicBackdrop';
+import { useCosmicBackdrop } from '../context/CosmicBackdropContext';
 import { getThemeColors } from '../utils/theme';
 import type { RootStackParamList } from './types';
 import { navigationRef } from './navigationRef';
@@ -32,12 +34,39 @@ import { WelcomeScreen } from '../screens/WelcomeScreen';
 import { LoginScreen } from '../screens/LoginScreen';
 import { RegisterScreen } from '../screens/RegisterScreen';
 import { PastTripSummaryScreen } from '../screens/PastTripSummaryScreen';
+import { GlobeMapScreen } from '../screens/GlobeMapScreen';
+import { GlobeMapTapOverlay } from '../components/GlobeMapTapOverlay';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
   const c = getThemeColors();
   const { isReady } = useAuth();
+  const { setEarthBackdropMode } = useCosmicBackdrop();
+  const [navRoute, setNavRoute] = useState<string | undefined>(undefined);
+  const [navigationReady, setNavigationReady] = useState(false);
+
+  const syncEarthBackdropMode = useCallback(() => {
+    if (!navigationRef.isReady()) return;
+    const name = navigationRef.getCurrentRoute()?.name;
+    setEarthBackdropMode(name === 'Welcome' ? 'gradient' : 'globe');
+  }, [setEarthBackdropMode]);
+
+  const syncNavRoute = useCallback(() => {
+    if (!navigationRef.isReady()) return;
+    setNavRoute(navigationRef.getCurrentRoute()?.name);
+  }, []);
+
+  const onNavigationReady = useCallback(() => {
+    setNavigationReady(true);
+    syncEarthBackdropMode();
+    syncNavRoute();
+  }, [syncEarthBackdropMode, syncNavRoute]);
+
+  const onNavigationStateChange = useCallback(() => {
+    syncEarthBackdropMode();
+    syncNavRoute();
+  }, [syncEarthBackdropMode, syncNavRoute]);
 
   const navTheme = {
     ...DarkTheme,
@@ -67,7 +96,12 @@ export function RootNavigator() {
     <View style={styles.shell}>
       <GlobalCosmicBackdrop />
       <View style={styles.navLayer}>
-        <NavigationContainer ref={navigationRef} theme={navTheme}>
+        <NavigationContainer
+          ref={navigationRef}
+          theme={navTheme}
+          onReady={onNavigationReady}
+          onStateChange={onNavigationStateChange}
+        >
           <Stack.Navigator
             initialRouteName="Welcome"
             screenOptions={{
@@ -99,6 +133,7 @@ export function RootNavigator() {
             <Stack.Screen name="CurrentMeetings" component={CurrentMeetingsScreen} options={{ title: 'Nexus · Meetings' }} />
             <Stack.Screen name="FoodDiscover" component={FoodDiscoverScreen} options={{ title: 'Nexus · Food' }} />
             <Stack.Screen name="TravelRouting" component={TravelRoutingScreen} options={{ title: 'Nexus · Maps' }} />
+            <Stack.Screen name="GlobeMap" component={GlobeMapScreen} options={{ headerShown: false, title: 'Map' }} />
             <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Nexus · You' }} />
             <Stack.Screen name="Transactions" component={TransactionsScreen} options={{ title: 'Nexus · Treasury' }} />
             <Stack.Screen name="Itinerary" component={ItineraryScreen} options={{ title: 'Nexus · Itinerary' }} />
@@ -122,6 +157,7 @@ export function RootNavigator() {
             />
           </Stack.Navigator>
         </NavigationContainer>
+        <GlobeMapTapOverlay currentRouteName={navRoute} navigationReady={navigationReady} />
       </View>
     </View>
   );
@@ -136,6 +172,7 @@ const styles = StyleSheet.create({
   navLayer: {
     flex: 1,
     zIndex: 1,
+    position: 'relative',
   },
   bootWrap: {
     flex: 1,

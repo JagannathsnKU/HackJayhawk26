@@ -1,4 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
+import type { EarthBackdropMode } from '../../context/CosmicBackdropContext';
+import { CobeBackdropGlobe } from './CobeBackdropGlobe';
 import './cosmic-parallax.css';
 
 export interface CosmicParallaxBgProps {
@@ -10,6 +12,7 @@ export interface CosmicParallaxBgProps {
   showBranding?: boolean;
   /** Horizontal parallax offset in px (e.g. from active tab index). */
   ambientParallaxPx?: number;
+  earthBackdropMode?: EarthBackdropMode;
 }
 
 const CosmicParallaxBg: React.FC<CosmicParallaxBgProps> = ({
@@ -19,6 +22,7 @@ const CosmicParallaxBg: React.FC<CosmicParallaxBgProps> = ({
   className = '',
   showBranding = true,
   ambientParallaxPx = 0,
+  earthBackdropMode = 'globe',
 }) => {
   const [smallStars, setSmallStars] = useState<string>('');
   const [mediumStars, setMediumStars] = useState<string>('');
@@ -59,7 +63,20 @@ const CosmicParallaxBg: React.FC<CosmicParallaxBgProps> = ({
         <div id="horizon">
           <div className="glow"></div>
         </div>
-        <div id="earth"></div>
+        <div id="earth" className={earthBackdropMode === 'globe' ? 'earth-globe-host' : undefined}>
+          {earthBackdropMode === 'globe' ? (
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                pointerEvents: 'none',
+                transform: 'translate(24.2%, -30%)',
+              }}
+            >
+              <CobeBackdropGlobe />
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {showBranding ? (

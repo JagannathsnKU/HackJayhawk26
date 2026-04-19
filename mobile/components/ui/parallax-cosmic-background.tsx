@@ -2,6 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Dimensions, LayoutChangeEvent, Platform, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle } from 'react-native-svg';
+import type { EarthBackdropMode } from '../../context/CosmicBackdropContext';
+import { getEarthGlobeLayout } from '../../utils/earthGlobeOverlayLayout';
+import { CobeBackdropGlobe } from './CobeBackdropGlobe';
 
 export interface CosmicParallaxBgProps {
   head: string;
@@ -11,6 +14,8 @@ export interface CosmicParallaxBgProps {
   className?: string;
   showBranding?: boolean;
   ambientParallaxPx?: number;
+  /** Welcome uses gradient sphere; other routes use COBE globe in the same slot. */
+  earthBackdropMode?: EarthBackdropMode;
 }
 
 interface Star {
@@ -71,6 +76,7 @@ function StarLayer({
 
   return (
     <Animated.View
+      pointerEvents="none"
       style={[
         StyleSheet.absoluteFill,
         { transform: [{ translateY: scrollY }], height: height * 2 },
@@ -136,6 +142,7 @@ export function CosmicParallaxBg({
   className: _className,
   showBranding = true,
   ambientParallaxPx = 0,
+  earthBackdropMode = 'globe',
 }: CosmicParallaxBgProps) {
   const win = Dimensions.get('window');
   const [size, setSize] = useState({ w: win.width, h: win.height });
@@ -159,6 +166,9 @@ export function CosmicParallaxBg({
 
   const stars = useMemo(() => generateStars(size.w, size.h), [size.w, size.h]);
   const textParts = text.split(',').map((p) => p.trim().toUpperCase());
+
+  /** Legacy planet slot (pre-resize). Globe content is nudged inside this mask only in COBE mode. */
+  const { earthDiameter, earthBottom, earthLeft, earthRadius } = getEarthGlobeLayout(size.w);
 
   return (
     <View style={styles.root} onLayout={onLayout}>
@@ -184,23 +194,44 @@ export function CosmicParallaxBg({
         />
 
         <View
+          pointerEvents="none"
           style={[
             styles.earthWrap,
             {
-              width: size.w * 1.7,
-              height: size.w * 1.7,
-              bottom: -(size.w * 1.7 * 0.42),
-              left: (size.w - size.w * 1.7) / 2,
+              width: earthDiameter,
+              height: earthDiameter,
+              bottom: earthBottom,
+              left: Math.round(earthLeft),
+              borderRadius: earthRadius,
             },
           ]}
         >
-          <LinearGradient
-            colors={['#2a4a6a', '#0f1724', '#050508']}
-            locations={[0, 0.42, 1]}
-            style={[StyleSheet.absoluteFill, { borderRadius: size.w * 1.7 }]}
-            start={{ x: 0.5, y: 0.32 }}
-            end={{ x: 0.5, y: 1 }}
-          />
+          {earthBackdropMode === 'gradient' ? (
+            <LinearGradient
+              colors={['#2a4a6a', '#0f1724', '#050508']}
+              locations={[0, 0.42, 1]}
+              style={[StyleSheet.absoluteFill, { borderRadius: earthRadius }]}
+              start={{ x: 0.5, y: 0.32 }}
+              end={{ x: 0.5, y: 1 }}
+            />
+          ) : (
+            <View
+              pointerEvents="none"
+              style={[
+                StyleSheet.absoluteFill,
+                {
+                  borderRadius: earthRadius,
+                  overflow: 'hidden',
+                  transform: [
+                    { translateX: Math.round(earthDiameter * 0.242) },
+                    { translateY: -Math.round(earthDiameter * 0.3) },
+                  ],
+                },
+              ]}
+            >
+              <CobeBackdropGlobe style={StyleSheet.absoluteFill} />
+            </View>
+          )}
         </View>
       </Animated.View>
 
@@ -255,7 +286,6 @@ const styles = StyleSheet.create({
   },
   earthWrap: {
     position: 'absolute',
-    borderRadius: 9999,
     overflow: 'hidden',
     backgroundColor: '#050508',
     shadowColor: '#000',
