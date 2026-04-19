@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CommonActions } from '@react-navigation/native';
-import type { MainTabScreenProps } from '../navigation/types';
+import type { RootStackScreenProps } from '../navigation/types';
 import { navigationRef } from '../navigation/navigationRef';
 import { useAuth } from '../context/AuthContext';
 import { useAppState } from '../context/AppProvider';
@@ -19,15 +19,17 @@ import { Card } from '../components/Card';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { SecondaryButton } from '../components/SecondaryButton';
 import { SectionHeader } from '../components/SectionHeader';
+import { NexusBrandLine } from '../components/NexusBrandLine';
 
-type Props = MainTabScreenProps<'ProfileTab'>;
+type Props = RootStackScreenProps<'Profile'>;
 
-type ModuleId = 'did' | 'info' | 'balances' | 'send';
+type ModuleId = 'did' | 'docs' | 'info' | 'balances' | 'send';
 
 const MODULES: { id: ModuleId; label: string; hint: string }[] = [
-  { id: 'did', label: 'DID', hint: 'XLS-40 identity' },
-  { id: 'info', label: 'You', hint: 'HR profile' },
-  { id: 'balances', label: 'Ledger', hint: 'RLUSD · XRP' },
+  { id: 'did', label: 'DID', hint: 'XLS-40' },
+  { id: 'docs', label: 'Travel IDs', hint: 'Passport · DL' },
+  { id: 'info', label: 'You', hint: 'HR' },
+  { id: 'balances', label: 'Ledger', hint: 'RLUSD' },
   { id: 'send', label: 'Send', hint: 'Transfers' },
 ];
 
@@ -77,11 +79,10 @@ export function ProfileScreen({}: Props) {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: 'transparent' }]} edges={['top', 'left', 'right']}>
       <View style={styles.top}>
-        <Text style={[styles.kicker, { color: colors.textMuted }]}>Identity & treasury</Text>
-        <Text style={[styles.title, { color: colors.text }]}>Profile</Text>
-        <Text style={[styles.sub, { color: colors.textSecondary }]}>
-          Choose a module — one surface at a time instead of one endless page.
-        </Text>
+        <NexusBrandLine />
+        <Text style={[styles.kicker, { color: colors.textMuted }]}>Profile</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Identity & wallet</Text>
+        <Text style={[styles.sub, { color: colors.textSecondary }]}>Pick a card below.</Text>
         {authUser ? (
           <Text style={[styles.authEmail, { color: colors.textMuted }]}>App login: {authUser.email}</Text>
         ) : null}
@@ -122,11 +123,13 @@ export function ProfileScreen({}: Props) {
           subtitle={
             active === 'did'
               ? 'Present proofs, not raw PII.'
-              : active === 'info'
-                ? 'Corporate directory (mock).'
-                : active === 'balances'
-                  ? 'Escrow & vault headroom.'
-                  : 'Build a signed transfer intent.'
+              : active === 'docs'
+                ? 'Uploads bind to your DID for XLS identity checks (demo only).'
+                : active === 'info'
+                  ? 'Corporate directory (mock).'
+                  : active === 'balances'
+                    ? 'Escrow & vault headroom.'
+                    : 'Build a signed transfer intent.'
           }
         />
         {active === 'did' ? (
@@ -138,6 +141,31 @@ export function ProfileScreen({}: Props) {
             <Pressable onPress={copyDid} style={styles.linkRow} accessibilityRole="button">
               <Text style={[styles.link, { color: colors.accent }]}>Copy / verify (demo)</Text>
             </Pressable>
+          </Card>
+        ) : null}
+
+        {active === 'docs' ? (
+          <Card style={{ gap: spacing.sm }}>
+            <Text style={[styles.label, { color: colors.textMuted }]}>Travel documents</Text>
+            <Text style={[styles.docHint, { color: colors.textSecondary }]}>
+              Encrypted vault + verifiable credentials (UI only). No files leave this device in the hackathon build.
+            </Text>
+            <SecondaryButton
+              title="Passport (upload demo)"
+              onPress={() => Alert.alert('Nexus', 'Would scan MRZ and attach a VC to your DID (demo).')}
+            />
+            <SecondaryButton
+              title="Driver license (upload demo)"
+              onPress={() => Alert.alert('Nexus', 'Would OCR fields for policy age / ID checks (demo).')}
+            />
+            <SecondaryButton
+              title="Visa / entry docs (upload demo)"
+              onPress={() => Alert.alert('Nexus', 'Would store encrypted copies for border workflows (demo).')}
+            />
+            <SecondaryButton
+              title="Trusted traveler / Global Entry (demo)"
+              onPress={() => Alert.alert('Nexus', 'Would link PASS ID metadata to your profile (demo).')}
+            />
           </Card>
         ) : null}
 
@@ -225,9 +253,7 @@ export function ProfileScreen({}: Props) {
           <SecondaryButton title="Sign out" onPress={() => void handleSignOut()} />
         </Card>
 
-        <Text style={[styles.footer, { color: colors.textMuted }]}>
-          DIDTokenCreate & signing hook to your XRPL environment in production.
-        </Text>
+        <Text style={[styles.footer, { color: colors.textMuted }]}>Nexus · XRPL-ready identity (prototype)</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -305,4 +331,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   footer: { marginTop: spacing.lg, fontSize: 12, textAlign: 'center' },
+  docHint: { fontSize: 14, lineHeight: 20 },
 });

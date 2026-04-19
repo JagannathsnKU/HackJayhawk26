@@ -190,7 +190,7 @@ export function CosmicParallaxBg({
               width: size.w * 1.7,
               height: size.w * 1.7,
               bottom: -(size.w * 1.7 * 0.42),
-              left: -(size.w * 0.35),
+              left: (size.w - size.w * 1.7) / 2,
             },
           ]}
         >

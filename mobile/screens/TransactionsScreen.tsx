@@ -1,15 +1,16 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { MainTabScreenProps } from '../navigation/types';
+import type { RootStackScreenProps } from '../navigation/types';
 import type { HookDecision, HookTransactionEvent } from '../models/types';
 import { useAppState } from '../context/AppProvider';
 import { radii, screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
 import { DrillDownModal } from '../components/DrillDownModal';
 import { SectionHeader } from '../components/SectionHeader';
+import { NexusBrandLine } from '../components/NexusBrandLine';
 
-type Props = MainTabScreenProps<'TransactionsTab'>;
+type Props = RootStackScreenProps<'Transactions'>;
 
 type Filter = 'all' | HookDecision;
 
@@ -27,11 +28,9 @@ export function TransactionsScreen({}: Props) {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: 'transparent' }]} edges={['top', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={[styles.kicker, { color: colors.textMuted }]}>Enforcement layer</Text>
-        <Text style={[styles.title, { color: colors.text }]}>Transactions</Text>
-        <Text style={[styles.sub, { color: colors.textSecondary }]}>
-          Filter by outcome, then open a case file — hook checks appear in the zoomed panel, not a long accordion.
-        </Text>
+        <NexusBrandLine />
+        <Text style={[styles.title, { color: colors.text }]}>Treasury hooks</Text>
+        <Text style={[styles.sub, { color: colors.textSecondary }]}>Tap a row for hook checks (demo).</Text>
 
         <View style={styles.filterRow}>
           {(
@@ -146,7 +145,6 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
     paddingBottom: spacing.xl * 2,
   },
-  kicker: { fontSize: 12, fontWeight: '600', letterSpacing: 0.6, textTransform: 'uppercase' },
   title: { fontSize: 26, fontWeight: '700', marginTop: 4, letterSpacing: -0.4 },
   sub: { fontSize: 15, lineHeight: 22, marginTop: spacing.sm },
   filterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.lg },

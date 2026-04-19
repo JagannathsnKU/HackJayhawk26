@@ -8,7 +8,8 @@ type CosmicBackdropContextValue = {
 const CosmicBackdropContext = createContext<CosmicBackdropContextValue | null>(null);
 
 export function CosmicBackdropProvider({ children }: { children: React.ReactNode }) {
-  const [tabIndex, setTabIndexState] = useState(0);
+  /** Default 1 keeps global backdrop parallax at 0 (centered planet) without bottom tabs. */
+  const [tabIndex, setTabIndexState] = useState(1);
   const setTabIndex = useCallback((index: number) => {
     setTabIndexState(index);
   }, []);

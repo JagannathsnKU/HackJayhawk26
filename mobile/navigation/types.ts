@@ -1,19 +1,25 @@
-import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import type { CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { ItineraryItem, PolicyState } from '../models/types';
-
-export type MainTabParamList = {
-  HomeTab: undefined;
-  ProfileTab: undefined;
-  TransactionsTab: undefined;
-};
 
 export type RootStackParamList = {
   Welcome: undefined;
   Login: undefined;
   Register: undefined;
-  MainTabs: undefined;
+  MainHome: undefined;
+  PlanNewTrip: undefined;
+  CurrentTrip: undefined;
+  Badges: undefined;
+  BookingHub: undefined;
+  BudgetPlanning: undefined;
+  BudgetCurrentTrip: undefined;
+  CompanyPolicyPlan: undefined;
+  PackingList: undefined;
+  CurrentBookings: undefined;
+  CurrentMeetings: undefined;
+  FoodDiscover: undefined;
+  TravelRouting: undefined;
+  Profile: undefined;
+  Transactions: undefined;
   Itinerary: undefined;
   ItemDetail: { itemId: string };
   Notifications: undefined;
@@ -26,16 +32,12 @@ export type RootStackParamList = {
     policyState: PolicyState;
     itineraryItemId?: string;
   };
+  PastTripSummary: { pastTripId: string };
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> = NativeStackScreenProps<
   RootStackParamList,
   T
->;
-
-export type MainTabScreenProps<T extends keyof MainTabParamList> = CompositeScreenProps<
-  BottomTabScreenProps<MainTabParamList, T>,
-  NativeStackScreenProps<RootStackParamList>
 >;
 
 declare global {

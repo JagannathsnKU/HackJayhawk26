@@ -34,7 +34,7 @@ export function RegisterScreen({ navigation }: Props) {
     setBusy(true);
     try {
       await signUp(email.trim(), password);
-      navigation.replace('MainTabs');
+      navigation.replace('MainHome');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not create account');
     } finally {

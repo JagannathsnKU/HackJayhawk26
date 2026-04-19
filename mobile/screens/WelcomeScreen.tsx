@@ -19,7 +19,11 @@ export function WelcomeScreen({ navigation }: Props) {
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <View style={styles.column}>
         <View style={styles.heroSlot}>
-          <CosmicLandingBranding head="Nexus" text="Secured, Safe, Travel" />
+          <CosmicLandingBranding
+            head="Nexus"
+            text="Secured, Safe, Travel"
+            logo={require('../assets/nexus-logo.png')}
+          />
         </View>
         <LinearGradient
           colors={['transparent', 'rgba(0, 0, 0, 0.35)', 'rgba(0, 0, 0, 0.55)']}
@@ -29,7 +33,7 @@ export function WelcomeScreen({ navigation }: Props) {
           <View style={styles.footerInner}>
             <View style={styles.buttonWrap}>
               {isLoggedIn ? (
-                <PrimaryButton title="Continue to app" onPress={() => navigation.replace('MainTabs')} />
+                <PrimaryButton title="Continue to app" onPress={() => navigation.replace('MainHome')} />
               ) : (
                 <>
                   <PrimaryButton title="Sign in" onPress={() => navigation.navigate('Login')} />

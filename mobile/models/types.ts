@@ -109,7 +109,7 @@ export interface AssistantResolution {
   suggestions: AssistantSuggestion[];
 }
 
-export type IssueCategory = 'flight' | 'hotel' | 'general';
+export type IssueCategory = 'flight' | 'hotel' | 'general' | 'emergency';
 
 /** Lanes for categorized companion insights (no internal codenames in UI). */
 export type CompanionUpdateLane = 'safety' | 'economy';
