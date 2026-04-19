@@ -19,7 +19,7 @@ export function ItemDetailScreen({ navigation, route }: Props) {
 
   if (!item) {
     return (
-      <View style={[styles.fallback, { backgroundColor: colors.background }]}>
+      <View style={[styles.fallback, { backgroundColor: 'transparent' }]}>
         <Text style={{ color: colors.textSecondary, padding: spacing.md }}>This item is no longer available.</Text>
       </View>
     );
@@ -36,7 +36,7 @@ export function ItemDetailScreen({ navigation, route }: Props) {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: colors.background }}
+      style={{ flex: 1, backgroundColor: 'transparent' }}
       contentContainerStyle={styles.body}
       showsVerticalScrollIndicator={false}
     >

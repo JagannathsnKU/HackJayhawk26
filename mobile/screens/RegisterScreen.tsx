@@ -44,7 +44,7 @@ export function RegisterScreen({ navigation }: Props) {
 
   return (
     <KeyboardAvoidingView
-      style={[styles.flex, { backgroundColor: colors.background }]}
+      style={[styles.flex, { backgroundColor: 'transparent' }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView

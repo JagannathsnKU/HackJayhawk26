@@ -38,7 +38,7 @@ export function ItineraryScreen({ navigation }: Props) {
 
   if (loading) {
     return (
-      <View style={[styles.center, { backgroundColor: colors.background }]}>
+      <View style={[styles.center, { backgroundColor: 'transparent' }]}>
         <Text style={{ color: colors.textSecondary }}>Loading itinerary…</Text>
       </View>
     );
@@ -47,7 +47,7 @@ export function ItineraryScreen({ navigation }: Props) {
   const current = itinerary[index];
 
   return (
-    <View style={[styles.root, { backgroundColor: colors.background }]}>
+    <View style={[styles.root, { backgroundColor: 'transparent' }]}>
       <Text style={[styles.intro, { color: colors.textSecondary, paddingHorizontal: screenPaddingX }]}>
         Swipe the deck — tap a card for policy, budget, and actions.
       </Text>

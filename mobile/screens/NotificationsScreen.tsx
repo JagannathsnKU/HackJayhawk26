@@ -24,7 +24,7 @@ export function NotificationsScreen({}: Props) {
   }, [notifications, filter]);
 
   return (
-    <View style={[styles.root, { backgroundColor: colors.background }]}>
+    <View style={[styles.root, { backgroundColor: 'transparent' }]}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Text style={[styles.intro, { color: colors.textSecondary }]}>
           Pick a tile — details open in a focused view instead of an endless feed.

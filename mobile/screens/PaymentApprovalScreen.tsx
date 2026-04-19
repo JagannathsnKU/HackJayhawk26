@@ -47,7 +47,7 @@ export function PaymentApprovalScreen({ navigation, route }: Props) {
   };
 
   return (
-    <View style={[styles.wrap, { backgroundColor: colors.background }]}>
+    <View style={[styles.wrap, { backgroundColor: 'transparent' }]}>
       <Card>
         <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
         <Text style={[styles.cost, { color: colors.text }]}>

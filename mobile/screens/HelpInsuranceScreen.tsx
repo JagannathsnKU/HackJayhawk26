@@ -22,7 +22,7 @@ export function HelpInsuranceScreen({}: Props) {
   const selected = TOPICS.find((t) => t.id === topicId);
 
   return (
-    <View style={[styles.root, { backgroundColor: colors.background }]}>
+    <View style={[styles.root, { backgroundColor: 'transparent' }]}>
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
         <SectionHeader title="You’re covered" subtitle="Lockton travel protection (mock) — pick a lane." />
 

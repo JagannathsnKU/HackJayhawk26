@@ -1,7 +1,8 @@
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { DarkTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
+import { GlobalCosmicBackdrop } from '../components/GlobalCosmicBackdrop';
 import { getThemeColors } from '../utils/theme';
 import type { RootStackParamList } from './types';
 import { navigationRef } from './navigationRef';
@@ -28,8 +29,8 @@ export function RootNavigator() {
     colors: {
       ...DarkTheme.colors,
       primary: c.accent,
-      background: c.background,
-      card: c.surface,
+      background: 'transparent',
+      card: 'rgba(12, 12, 18, 0.88)',
       text: c.text,
       border: c.border,
       notification: c.accent,
@@ -38,24 +39,30 @@ export function RootNavigator() {
 
   if (!isReady) {
     return (
-      <View style={{ flex: 1, backgroundColor: c.background, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color={c.accent} />
+      <View style={styles.bootWrap}>
+        <GlobalCosmicBackdrop />
+        <View style={styles.bootInner}>
+          <ActivityIndicator size="large" color={c.accent} />
+        </View>
       </View>
     );
   }
 
   return (
-    <NavigationContainer ref={navigationRef} theme={navTheme}>
-      <Stack.Navigator
-        initialRouteName="Welcome"
-        screenOptions={{
-          headerShadowVisible: false,
-          headerStyle: { backgroundColor: c.surface },
-          headerTintColor: c.text,
-          headerTitleStyle: { fontWeight: '600', fontSize: 17 },
-          contentStyle: { backgroundColor: c.background },
-        }}
-      >
+    <View style={styles.shell}>
+      <GlobalCosmicBackdrop />
+      <View style={styles.navLayer}>
+        <NavigationContainer ref={navigationRef} theme={navTheme}>
+          <Stack.Navigator
+            initialRouteName="Welcome"
+            screenOptions={{
+              headerShadowVisible: false,
+              headerStyle: { backgroundColor: 'rgba(12, 12, 18, 0.88)' },
+              headerTintColor: c.text,
+              headerTitleStyle: { fontWeight: '600', fontSize: 17 },
+              contentStyle: { backgroundColor: 'transparent' },
+            }}
+          >
         <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Sign in' }} />
         <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Create account' }} />
@@ -79,7 +86,32 @@ export function RootNavigator() {
           component={PaymentApprovalScreen}
           options={{ title: 'Review', presentation: 'modal' }}
         />
-      </Stack.Navigator>
-    </NavigationContainer>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  shell: {
+    flex: 1,
+    position: 'relative',
+    backgroundColor: '#000000',
+  },
+  navLayer: {
+    flex: 1,
+    zIndex: 1,
+  },
+  bootWrap: {
+    flex: 1,
+    position: 'relative',
+    backgroundColor: '#000000',
+  },
+  bootInner: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

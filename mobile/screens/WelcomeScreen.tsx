@@ -1,49 +1,46 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { AnomalousMatterHero } from '../components/ui/anomalous-matter-hero';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CosmicLandingBranding } from '../components/ui/CosmicLandingBranding';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { SecondaryButton } from '../components/SecondaryButton';
 import { useAuth } from '../context/AuthContext';
-import { getThemeColors } from '../utils/theme';
 import type { RootStackScreenProps } from '../navigation/types';
 
 type Props = RootStackScreenProps<'Welcome'>;
 
 export function WelcomeScreen({ navigation }: Props) {
-  const colors = getThemeColors();
   const { user, token } = useAuth();
   const isLoggedIn = Boolean(user && token);
+  const insets = useSafeAreaInsets();
 
   return (
-    <SafeAreaView
-      style={[styles.safe, { backgroundColor: colors.background }]}
-      edges={['top', 'right', 'left', 'bottom']}
-    >
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <View style={styles.column}>
-        <View style={[styles.heroSlot]}>
-          <AnomalousMatterHero
-            subtitle="Intelligent Travel Companion"
-            description="Trip guardrails, policy, and smart travel tools in one place."
-            meshRadius={0.68}
-            cameraZ={5.1}
-            fov={48}
-          />
+        <View style={styles.heroSlot}>
+          <CosmicLandingBranding head="Nexus" text="Secured, Safe, Travel" />
         </View>
-        <View style={[styles.footer, { backgroundColor: colors.background }]}>
-          <View style={styles.buttonWrap}>
-            {isLoggedIn ? (
-              <PrimaryButton title="Continue to app" onPress={() => navigation.replace('MainTabs')} />
-            ) : (
-              <>
-                <PrimaryButton title="Sign in" onPress={() => navigation.navigate('Login')} />
-                <View style={styles.secondaryWrap}>
-                  <SecondaryButton title="Create account" onPress={() => navigation.navigate('Register')} />
-                </View>
-              </>
-            )}
+        <LinearGradient
+          colors={['transparent', 'rgba(0, 0, 0, 0.35)', 'rgba(0, 0, 0, 0.55)']}
+          locations={[0, 0.45, 1]}
+          style={[styles.footerGradient, { paddingBottom: Math.max(insets.bottom, 12) }]}
+        >
+          <View style={styles.footerInner}>
+            <View style={styles.buttonWrap}>
+              {isLoggedIn ? (
+                <PrimaryButton title="Continue to app" onPress={() => navigation.replace('MainTabs')} />
+              ) : (
+                <>
+                  <PrimaryButton title="Sign in" onPress={() => navigation.navigate('Login')} />
+                  <View style={styles.secondaryWrap}>
+                    <SecondaryButton title="Create account" onPress={() => navigation.navigate('Register')} />
+                  </View>
+                </>
+              )}
+            </View>
           </View>
-        </View>
+        </LinearGradient>
       </View>
     </SafeAreaView>
   );
@@ -52,6 +49,7 @@ export function WelcomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
+    backgroundColor: 'transparent',
   },
   column: {
     flex: 1,
@@ -61,15 +59,18 @@ const styles = StyleSheet.create({
   heroSlot: {
     flex: 1,
     minHeight: 0,
-    width: '100%'
+    minWidth: 0,
+    width: '100%',
   },
-  footer: {
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 8,
+  footerGradient: {
     width: '100%',
     maxWidth: 440,
     alignSelf: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 16,
+  },
+  footerInner: {
+    width: '100%',
   },
   buttonWrap: {
     width: '100%',

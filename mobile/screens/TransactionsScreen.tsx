@@ -25,7 +25,7 @@ export function TransactionsScreen({}: Props) {
   }, [hookEvents, filter]);
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: 'transparent' }]} edges={['top', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Text style={[styles.kicker, { color: colors.textMuted }]}>Enforcement layer</Text>
         <Text style={[styles.title, { color: colors.text }]}>Transactions</Text>

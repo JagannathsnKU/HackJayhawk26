@@ -1,6 +1,9 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React, { useEffect } from 'react';
+import { StyleSheet } from 'react-native';
+import { BottomTabBar, createBottomTabNavigator, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { getThemeColors } from '../utils/theme';
+import { useCosmicBackdrop } from '../context/CosmicBackdropContext';
 import type { MainTabParamList } from './types';
 import { HomeScreen } from '../screens/HomeScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
@@ -8,21 +11,34 @@ import { TransactionsScreen } from '../screens/TransactionsScreen';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
+function TabParallaxBar(props: BottomTabBarProps) {
+  const { setTabIndex } = useCosmicBackdrop();
+
+  useEffect(() => {
+    setTabIndex(props.state.index);
+  }, [props.state.index, setTabIndex]);
+
+  return <BottomTabBar {...props} />;
+}
+
 export function MainTabNavigator() {
   const c = getThemeColors();
 
   return (
     <Tab.Navigator
       initialRouteName="HomeTab"
+      tabBar={(props) => <TabParallaxBar {...props} />}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: c.accent,
         tabBarInactiveTintColor: c.textMuted,
         tabBarStyle: {
-          backgroundColor: c.surface,
-          borderTopColor: c.border,
+          backgroundColor: 'rgba(8, 10, 20, 0.82)',
+          borderTopColor: 'rgba(255, 255, 255, 0.08)',
+          borderTopWidth: StyleSheet.hairlineWidth,
         },
         tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        sceneStyle: { backgroundColor: 'transparent' },
       }}
     >
       <Tab.Screen

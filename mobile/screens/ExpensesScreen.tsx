@@ -50,7 +50,7 @@ export function ExpensesScreen({}: Props) {
 
   return (
     <ScrollView
-      style={[styles.root, { backgroundColor: colors.background }]}
+      style={[styles.root, { backgroundColor: 'transparent' }]}
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
     >

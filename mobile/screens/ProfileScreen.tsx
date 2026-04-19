@@ -75,7 +75,7 @@ export function ProfileScreen({}: Props) {
   }, [destination, sendAmount, sendAsset]);
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: 'transparent' }]} edges={['top', 'left', 'right']}>
       <View style={styles.top}>
         <Text style={[styles.kicker, { color: colors.textMuted }]}>Identity & treasury</Text>
         <Text style={[styles.title, { color: colors.text }]}>Profile</Text>

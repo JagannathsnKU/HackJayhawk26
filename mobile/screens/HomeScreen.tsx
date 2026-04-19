@@ -41,7 +41,7 @@ export function HomeScreen({ navigation }: Props) {
   const visibleTimeline = dayExpanded ? trip?.timelineToday ?? [] : trip?.timelineToday.slice(0, 2) ?? [];
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: 'transparent' }]} edges={['top', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.topRow}>
           <View>

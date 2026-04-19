@@ -47,7 +47,7 @@ export function FixSituationScreen({ navigation }: Props) {
   };
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: colors.background }} contentContainerStyle={styles.body}>
+    <ScrollView style={{ flex: 1, backgroundColor: 'transparent' }} contentContainerStyle={styles.body}>
       {step === 'choose' ? (
         <>
           <SectionHeader title="What’s wrong?" subtitle="Pick one — we’ll handle the rest." />
