@@ -23,7 +23,6 @@ export function WelcomeScreen({ navigation }: Props) {
       <View style={styles.column}>
         <View style={[styles.heroSlot]}>
           <AnomalousMatterHero
-            title="HackJayhawk"
             subtitle="Intelligent Travel Companion"
             description="Trip guardrails, policy, and smart travel tools in one place."
             meshRadius={0.68}

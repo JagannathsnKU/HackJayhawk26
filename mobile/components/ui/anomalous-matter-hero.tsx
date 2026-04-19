@@ -8,10 +8,8 @@ import { useAppTheme } from '../../utils/theme';
 const MESH_BG = '#000000';
 const MESH_LINE = '#ffffff';
 
-const TEXT_COLOR = '#0f3d2e';
-
 export function AnomalousMatterHero({
-  title = 'Welcome',
+  title = '',
   subtitle = '',
   description = '',
   meshRadius,
@@ -48,10 +46,16 @@ export function AnomalousMatterHero({
 
       <View style={styles.content}>
         <Animated.View style={[styles.copyBlock, { opacity, transform: [{ translateY }] }]}>
-          <Text style={[styles.kicker, { color: TEXT_COLOR }]}>{title}</Text>
-          <Text style={[styles.subtitle, { color: TEXT_COLOR }]}>{subtitle}</Text>
+          {title ? (
+            <Text style={[styles.kicker, { color: colors.text }]}>{title}</Text>
+          ) : null}
+          {subtitle ? (
+            <Text style={[styles.subtitle, !title && styles.subtitleNoKicker, { color: colors.text }]}>
+              {subtitle}
+            </Text>
+          ) : null}
           {description ? (
-            <Text style={[styles.body, { color: TEXT_COLOR }]}>{description}</Text>
+            <Text style={[styles.body, { color: colors.text }]}>{description}</Text>
           ) : null}
         </Animated.View>
       </View>
@@ -90,6 +94,9 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     textTransform: 'uppercase',
     textAlign: 'center',
+  },
+  subtitleNoKicker: {
+    marginTop: 0,
   },
   subtitle: {
     marginTop: 20,

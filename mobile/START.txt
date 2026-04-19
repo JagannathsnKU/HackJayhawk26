@@ -1,0 +1,14 @@
+Expo Go (physical phone) — use tunnel, not plain LAN
+
+1) Stop any other Expo window (Ctrl+C) so port 8081/8082 is not stuck.
+2) From this folder run:
+     npm start
+   (starts Metro with --tunnel on port 8082)
+3) Scan the NEW QR in that terminal with Expo Go.
+
+Web browser:
+     npm run web
+   or: npm start  then press  w
+
+Do NOT use only: npx expo start --web
+That often breaks Expo Go because the phone cannot reach your laptop’s LAN IP.
