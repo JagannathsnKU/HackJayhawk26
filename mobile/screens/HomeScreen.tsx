@@ -8,6 +8,7 @@ import { HubTile } from '../components/HubTile';
 import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 import { radii, screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { PAST_TRIP_LIST } from '../utils/pastTrips';
+import { VoiceAgentFab } from '../components/ui/voice-agent-fab';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MainHome'>;
 
@@ -19,7 +20,8 @@ export function HomeScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: 'transparent' }]} edges={['top', 'left', 'right']}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <View style={styles.homeLayer}>
+        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.topRow}>
           <View style={{ flex: 1 }}>
             <Text style={[styles.kicker, { color: colors.textMuted }]}>Nexus</Text>
@@ -143,17 +145,25 @@ export function HomeScreen({ navigation }: Props) {
         <View style={styles.full}>
           <HubTile title="Badges" icon="★" compact onPress={() => navigation.navigate('Badges')} />
         </View>
-      </ScrollView>
+        </ScrollView>
+        <VoiceAgentFab
+          accent={colors.accent}
+          text={colors.text}
+          textMuted={colors.textMuted}
+          onAccent={colors.onAccent}
+        />
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
+  homeLayer: { flex: 1, position: 'relative' },
   scroll: {
     paddingHorizontal: screenPaddingX,
     paddingTop: spacing.md,
-    paddingBottom: spacing.xl * 2,
+    paddingBottom: spacing.xl * 2 + 72,
     gap: spacing.md,
   },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: spacing.md },

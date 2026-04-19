@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Modal, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import type { AssistantSuggestion, IssueCategory } from '../models/types';
@@ -32,7 +32,6 @@ export function FixSituationScreen({ navigation, route }: Props) {
   const [options, setOptions] = useState<AssistantSuggestion[]>([]);
   const [compareVisible, setCompareVisible] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [twistOn, setTwistOn] = useState(false);
 
   const startResolution = async (cat: IssueCategory) => {
     setBusy(true);
@@ -71,29 +70,10 @@ export function FixSituationScreen({ navigation, route }: Props) {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: 'transparent' }} contentContainerStyle={styles.body}>
-      <Card style={[styles.twistCard, { borderColor: colors.accent }]}>
-        <View style={styles.twistTop}>
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.twistKicker, { color: colors.accent }]}>2026 twist · UI shell only</Text>
-            <Text style={[styles.twistTitle, { color: colors.text }]}>Chronos disruption mesh</Text>
-            <Text style={[styles.twistBody, { color: colors.textSecondary }]}>
-              Proactive rerouting hints would fuse live ops, weather, and treasury posture. No backend calls — this
-              toggle is a visual placeholder for the hackathon narrative.
-            </Text>
-          </View>
-          <Switch value={twistOn} onValueChange={setTwistOn} accessibilityLabel="Chronos mesh preview" />
-        </View>
-        <Text style={[styles.twistFoot, { color: colors.textMuted }]}>
-          Status: {twistOn ? 'Preview armed (no signal)' : 'Idle'}
-        </Text>
-      </Card>
-
       {step === 'choose' ? (
         <>
-          <SectionHeader title="What is wrong?" subtitle="Pick the closest lane — assistant stays mocked." />
-          <Text style={[styles.lede, { color: colors.textSecondary }]}>
-            Structured triage keeps the page calm: one decision per row, no mixed paragraphs.
-          </Text>
+          <SectionHeader title="What is wrong?" subtitle="Pick the closest issue type." />
+          <Text style={[styles.lede, { color: colors.textSecondary }]}>Choose one lane to see suggested next steps.</Text>
 
           <View style={styles.issueGrid}>
             {ISSUES.map((it) => (
@@ -115,7 +95,7 @@ export function FixSituationScreen({ navigation, route }: Props) {
       ) : (
         <>
           <View style={styles.suggestHeader}>
-            <SectionHeader title="Calm path forward" subtitle="Mock assistant output." />
+            <SectionHeader title="Suggested next steps" subtitle="Demo assistant." />
             <SecondaryButton title="Start over" onPress={reset} />
           </View>
 
@@ -197,12 +177,6 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl * 2,
     gap: spacing.md,
   },
-  twistCard: { gap: spacing.sm, borderWidth: 2, borderRadius: radii.lg },
-  twistTop: { flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' },
-  twistKicker: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase' },
-  twistTitle: { fontSize: 18, fontWeight: '800', marginTop: 4 },
-  twistBody: { fontSize: 14, lineHeight: 21, marginTop: spacing.sm },
-  twistFoot: { fontSize: 12, fontWeight: '600' },
   lede: { fontSize: 14, lineHeight: 20 },
   issueGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   issuePress: { width: '48%' },

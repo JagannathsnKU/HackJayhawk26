@@ -42,7 +42,7 @@ export function CurrentTripScreen({ navigation }: Props) {
 
         <Text style={[styles.section, { color: colors.textMuted }]}>Updates</Text>
         <Text style={[styles.scanHint, { color: colors.textSecondary }]}>
-          Nexus would watch flight disruption feeds, geopolitical risk APIs, and fare drops (not connected in this demo).
+          Live disruption and fare feeds are not connected in this demo.
         </Text>
         <ScrollView
           horizontal

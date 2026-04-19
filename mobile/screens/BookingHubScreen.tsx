@@ -11,10 +11,16 @@ type Props = NativeStackScreenProps<RootStackParamList, 'BookingHub'>;
 
 type BookRow = { id: string; label: string; meta: string; price: string; best?: boolean };
 
-const FLIGHTS: BookRow[] = [
-  { id: 'f1', label: 'ANA 107 · SFO–NRT', meta: 'Economy · preferred · arrives 14:20', price: '$1,180', best: true },
-  { id: 'f2', label: 'UA 875 · SFO–NRT', meta: 'Economy · 1 stop', price: '$1,240' },
-  { id: 'f3', label: 'JL 002 · SFO–HND', meta: 'Economy · Haneda', price: '$1,205' },
+const FLIGHTS_OUTBOUND: BookRow[] = [
+  { id: 'f1o', label: 'ANA 107 · SFO → NRT', meta: 'Outbound · economy · preferred', price: '$1,180', best: true },
+  { id: 'f2o', label: 'UA 875 · SFO → NRT', meta: 'Outbound · economy · 1 stop', price: '$1,240' },
+  { id: 'f3o', label: 'JL 002 · SFO → HND', meta: 'Outbound · economy · Haneda', price: '$1,205' },
+];
+
+const FLIGHTS_RETURN: BookRow[] = [
+  { id: 'f1r', label: 'JL 058 · NRT → SFO', meta: 'Return · economy · same alliance', price: '$1,120', best: true },
+  { id: 'f2r', label: 'UA 838 · NRT → SFO', meta: 'Return · economy · 1 stop', price: '$1,090' },
+  { id: 'f3r', label: 'NH 008 · HND → SFO', meta: 'Return · economy · Haneda', price: '$1,175' },
 ];
 
 const HOTELS: BookRow[] = [
@@ -34,10 +40,12 @@ export function BookingHubScreen({ navigation }: Props) {
     >
       <NexusBrandLine />
       <Text style={[styles.title, { color: colors.text }]}>Booking</Text>
-      <Text style={[styles.hint, { color: colors.textMuted }]}>AI pick = best price inside policy (demo).</Text>
+      <Text style={[styles.hint, { color: colors.textMuted }]}>
+        Pick outbound and return flights separately. AI pick = best price inside policy (demo).
+      </Text>
 
-      <Text style={[styles.section, { color: colors.textMuted }]}>Flights</Text>
-      {FLIGHTS.map((r) => (
+      <Text style={[styles.section, { color: colors.textMuted }]}>Flights · outbound</Text>
+      {FLIGHTS_OUTBOUND.map((r) => (
         <LiquidGlassPressable
           key={r.id}
           onPress={() =>
@@ -55,6 +63,30 @@ export function BookingHubScreen({ navigation }: Props) {
             {r.best ? (
               <Text style={[styles.badge, { color: colors.accent }]}>AI pick</Text>
             ) : null}
+            <Text style={[styles.rowTitle, { color: colors.text }]}>{r.label}</Text>
+            <Text style={[styles.rowMeta, { color: colors.textSecondary }]}>{r.meta}</Text>
+          </View>
+          <Text style={[styles.price, { color: colors.text }]}>{r.price}</Text>
+        </LiquidGlassPressable>
+      ))}
+
+      <Text style={[styles.section, { color: colors.textMuted }]}>Flights · return</Text>
+      {FLIGHTS_RETURN.map((r) => (
+        <LiquidGlassPressable
+          key={r.id}
+          onPress={() =>
+            navigation.navigate('PaymentApproval', {
+              title: r.label,
+              amountUsd: parseInt(r.price.replace(/[^0-9]/g, ''), 10) || 1120,
+              policyState: 'within_policy',
+            })
+          }
+          variant={r.best ? 'tileAccent' : 'tile'}
+          minHeight={76}
+          innerStyle={styles.rowInner}
+        >
+          <View style={{ flex: 1 }}>
+            {r.best ? <Text style={[styles.badge, { color: colors.accent }]}>AI pick</Text> : null}
             <Text style={[styles.rowTitle, { color: colors.text }]}>{r.label}</Text>
             <Text style={[styles.rowMeta, { color: colors.textSecondary }]}>{r.meta}</Text>
           </View>

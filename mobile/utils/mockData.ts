@@ -48,6 +48,24 @@ export const MOCK_TRIP: TripSummary = {
       title: 'Client dinner',
       subtitle: 'Walking distance',
     },
+    {
+      id: 'tl-6',
+      timeLabel: 'Apr 21 · 08:30',
+      title: 'Checkout · car to NRT',
+      subtitle: 'Allow 90m at peak',
+    },
+    {
+      id: 'tl-7',
+      timeLabel: 'Apr 21 · 11:40',
+      title: 'Return flight · NRT → SFO',
+      subtitle: 'JL 058 · economy on ticket',
+    },
+    {
+      id: 'tl-8',
+      timeLabel: 'Apr 21',
+      title: 'Arrive SFO · onward',
+      subtitle: 'Car to office (booked)',
+    },
   ],
 };
 
@@ -55,7 +73,7 @@ export const MOCK_ITINERARY: ItineraryItem[] = [
   {
     id: 'it-1',
     kind: 'flight',
-    title: 'SFO → NRT',
+    title: 'SFO → NRT (outbound)',
     subtitle: 'ANA 107 · Economy',
     startTime: '09:15',
     endTime: '14:20',
@@ -103,6 +121,7 @@ export const MOCK_ITINERARY: ItineraryItem[] = [
     title: 'NRT → SFO (return)',
     subtitle: 'JL 058 · Business (approval)',
     startTime: 'Apr 21 · 11:40',
+    endTime: 'Apr 21 · 06:20 PT',
     location: 'Tokyo → San Francisco',
     statusBadge: 'risk',
     policyState: 'requires_approval',

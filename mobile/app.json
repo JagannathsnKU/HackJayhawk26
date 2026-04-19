@@ -34,6 +34,12 @@
         {
           "photosPermission": "Nexus adds trip photos you choose from your library."
         }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Nexus uses the microphone to scale the voice assistant orb while you speak."
+        }
       ]
     ]
   }
