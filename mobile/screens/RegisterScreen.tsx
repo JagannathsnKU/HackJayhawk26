@@ -1,18 +1,10 @@
 import React, { useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
 import type { RootStackParamList } from '../navigation/types';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
@@ -90,9 +82,15 @@ export function RegisterScreen({ navigation }: Props) {
           <PrimaryButton title="Create account" onPress={() => void submit()} loading={busy} />
         </View>
 
-        <Pressable onPress={() => navigation.navigate('Login')} style={styles.linkWrap} accessibilityRole="button">
-          <Text style={[styles.link, { color: colors.accent }]}>Already have an account? Sign in</Text>
-        </Pressable>
+        <LiquidGlassPressable
+          onPress={() => navigation.navigate('Login')}
+          variant="secondary"
+          minHeight={46}
+          pressableStyle={styles.linkWrap}
+          innerStyle={styles.linkInner}
+        >
+          <Text style={[styles.link, { color: colors.text }]}>Already have an account? Sign in</Text>
+        </LiquidGlassPressable>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -117,6 +115,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   err: { fontSize: 14, marginBottom: spacing.sm, fontWeight: '600' },
-  linkWrap: { alignSelf: 'center', marginTop: spacing.lg, padding: spacing.sm },
+  linkWrap: { alignSelf: 'center', marginTop: spacing.lg },
+  linkInner: { paddingVertical: 10, paddingHorizontal: spacing.md },
   link: { fontSize: 16, fontWeight: '600' },
 });

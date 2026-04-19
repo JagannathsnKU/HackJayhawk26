@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { radii, spacing, useAppTheme } from '../utils/theme';
+import { LiquidGlassPressable } from './LiquidGlassPressable';
 
 type Props = {
   visible: boolean;
@@ -70,14 +71,15 @@ export function DrillDownModal({ visible, onClose, title, subtitle, children }: 
             <ScrollView style={styles.panelBody} showsVerticalScrollIndicator={false}>
               {children}
             </ScrollView>
-            <Pressable
+            <LiquidGlassPressable
               onPress={onClose}
-              style={[styles.closeBtn, { borderColor: colors.border }]}
-              accessibilityRole="button"
-              accessibilityLabel="Close"
+              variant="secondary"
+              minHeight={48}
+              pressableStyle={styles.closePress}
+              innerStyle={styles.closeInner}
             >
               <Text style={[styles.closeText, { color: colors.text }]}>Close</Text>
-            </Pressable>
+            </LiquidGlassPressable>
           </Pressable>
         </Animated.View>
       </Pressable>
@@ -114,13 +116,11 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.md,
     maxHeight: 360,
   },
-  closeBtn: {
+  closePress: {
     marginHorizontal: spacing.lg,
     marginBottom: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    alignItems: 'center',
+    marginTop: spacing.sm,
   },
+  closeInner: { paddingVertical: 10 },
   closeText: { fontSize: 16, fontWeight: '600' },
 });

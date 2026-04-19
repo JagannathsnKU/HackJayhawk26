@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { Card } from '../components/Card';
 import { NexusBrandLine } from '../components/NexusBrandLine';
-import { radii, screenPaddingX, spacing, useAppTheme } from '../utils/theme';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
+import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'FoodDiscover'>;
 
@@ -79,19 +80,17 @@ export function FoodDiscoverScreen({}: Props) {
         {DIET_FILTERS.map((f) => {
           const on = diet === f.id;
           return (
-            <Pressable
+            <LiquidGlassPressable
               key={f.id}
               onPress={() => setDiet(f.id)}
-              style={[
-                styles.chip,
-                {
-                  borderColor: on ? colors.accent : colors.border,
-                  backgroundColor: on ? colors.accentMuted : colors.surface,
-                },
-              ]}
+              variant={on ? 'chipActive' : 'chip'}
+              minHeight={40}
+              pressableStyle={styles.chipWrap}
+              innerStyle={styles.chipInner}
+              accessibilityState={{ selected: on }}
             >
-              <Text style={[styles.chipText, { color: on ? colors.accent : colors.textMuted }]}>{f.label}</Text>
-            </Pressable>
+              <Text style={[styles.chipText, { color: on ? colors.text : colors.textMuted }]}>{f.label}</Text>
+            </LiquidGlassPressable>
           );
         })}
       </View>
@@ -106,9 +105,15 @@ export function FoodDiscoverScreen({}: Props) {
             {r.cuisine} · {r.price}
           </Text>
           <Text style={[styles.blurb, { color: colors.textSecondary }]}>{r.blurb}</Text>
-          <Pressable style={[styles.cta, { borderColor: colors.border }]} accessibilityRole="button">
+          <LiquidGlassPressable
+            onPress={() => {}}
+            variant="secondary"
+            minHeight={44}
+            pressableStyle={{ alignSelf: 'flex-start' }}
+            innerStyle={styles.ctaInner}
+          >
             <Text style={[styles.ctaText, { color: colors.text }]}>Hold table (demo)</Text>
-          </Pressable>
+          </LiquidGlassPressable>
         </Card>
       ))}
     </ScrollView>
@@ -121,25 +126,18 @@ const styles = StyleSheet.create({
   pageTitle: { fontSize: 22, fontWeight: '800' },
   filterLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 0.4, textTransform: 'uppercase' },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  chip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.pill,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
+  chipWrap: { alignSelf: 'flex-start' },
+  chipInner: { paddingVertical: 8, paddingHorizontal: spacing.md },
   chipText: { fontSize: 13, fontWeight: '700' },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.sm },
   name: { fontSize: 18, fontWeight: '800', flex: 1 },
   stars: { fontSize: 16, fontWeight: '800' },
   meta: { fontSize: 14, fontWeight: '600' },
   blurb: { fontSize: 14, lineHeight: 20 },
-  cta: {
-    alignSelf: 'flex-start',
-    marginTop: spacing.xs,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.md,
-    borderWidth: StyleSheet.hairlineWidth,
+  ctaInner: {
+    marginTop: 0,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 8,
   },
   ctaText: { fontSize: 14, fontWeight: '700' },
 });

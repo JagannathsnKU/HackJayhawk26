@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Modal, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, Modal, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import type { AssistantSuggestion, IssueCategory } from '../models/types';
@@ -9,6 +9,7 @@ import { Card } from '../components/Card';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { SecondaryButton } from '../components/SecondaryButton';
 import { SectionHeader } from '../components/SectionHeader';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'FixSituation'>;
 
@@ -96,22 +97,18 @@ export function FixSituationScreen({ navigation, route }: Props) {
 
           <View style={styles.issueGrid}>
             {ISSUES.map((it) => (
-              <Pressable
+              <LiquidGlassPressable
                 key={it.cat}
                 onPress={() => void startResolution(it.cat)}
-                style={({ pressed }) => [
-                  styles.issueTile,
-                  {
-                    borderColor: it.accent ? colors.accent : colors.border,
-                    backgroundColor: it.accent ? colors.accentMuted : colors.surface,
-                    opacity: pressed ? 0.88 : 1,
-                  },
-                ]}
+                variant={it.accent ? 'tileAccent' : 'tile'}
+                minHeight={108}
+                pressableStyle={styles.issuePress}
+                innerStyle={styles.issueInner}
               >
                 <Text style={[styles.issueGlyph, { color: colors.accent }]}>{it.glyph}</Text>
                 <Text style={[styles.issueLabel, { color: colors.text }]}>{it.title}</Text>
                 <Text style={[styles.issueSub, { color: colors.textMuted }]}>{it.sub}</Text>
-              </Pressable>
+              </LiquidGlassPressable>
             ))}
           </View>
         </>
@@ -208,13 +205,11 @@ const styles = StyleSheet.create({
   twistFoot: { fontSize: 12, fontWeight: '600' },
   lede: { fontSize: 14, lineHeight: 20 },
   issueGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  issueTile: {
-    width: '48%',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: radii.lg,
+  issuePress: { width: '48%' },
+  issueInner: {
+    alignItems: 'flex-start',
     padding: spacing.md,
     gap: 6,
-    minHeight: 118,
   },
   issueGlyph: { fontSize: 26, fontWeight: '600' },
   issueLabel: { fontSize: 16, fontWeight: '800' },

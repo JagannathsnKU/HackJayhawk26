@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
 import { DrillDownModal } from '../components/DrillDownModal';
 import { SectionHeader } from '../components/SectionHeader';
-import { radii } from '../utils/theme';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'HelpInsurance'>;
 
@@ -36,17 +36,13 @@ export function HelpInsuranceScreen({}: Props) {
         <Text style={[styles.laneTitle, { color: colors.textMuted }]}>What do you need?</Text>
         <View style={styles.laneGrid}>
           {TOPICS.map((t) => (
-            <Pressable
+            <LiquidGlassPressable
               key={t.id}
               onPress={() => setTopicId(t.id)}
-              style={[
-                styles.laneTile,
-                {
-                  borderColor: topicId === t.id ? colors.accent : colors.border,
-                  backgroundColor: topicId === t.id ? colors.accentMuted : colors.surface,
-                },
-              ]}
-              accessibilityRole="button"
+              variant={topicId === t.id ? 'tileAccent' : 'tile'}
+              minHeight={112}
+              pressableStyle={styles.lanePress}
+              innerStyle={styles.laneInner}
               accessibilityState={{ selected: topicId === t.id }}
             >
               <Text style={[styles.laneIcon, { color: colors.accent }]}>{t.icon}</Text>
@@ -54,7 +50,7 @@ export function HelpInsuranceScreen({}: Props) {
               <Text style={[styles.lanePeek, { color: colors.textMuted }]} numberOfLines={2}>
                 {t.description}
               </Text>
-            </Pressable>
+            </LiquidGlassPressable>
           ))}
         </View>
 
@@ -97,12 +93,13 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   laneGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  laneTile: {
+  lanePress: {
     width: '31%',
     flexGrow: 1,
     minWidth: 100,
-    borderRadius: radii.md,
-    borderWidth: StyleSheet.hairlineWidth,
+  },
+  laneInner: {
+    alignItems: 'flex-start',
     padding: spacing.sm,
     gap: 6,
   },

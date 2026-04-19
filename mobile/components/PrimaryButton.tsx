@@ -1,6 +1,7 @@
 import React from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, Text } from 'react-native';
-import { radii, spacing, useAppTheme } from '../utils/theme';
+import { ActivityIndicator, StyleSheet, Text } from 'react-native';
+import { LiquidGlassPressable } from './LiquidGlassPressable';
+import { spacing, useAppTheme } from '../utils/theme';
 
 type Props = {
   title: string;
@@ -14,36 +15,25 @@ export function PrimaryButton({ title, onPress, loading, disabled }: Props) {
   const inactive = disabled || loading;
 
   return (
-    <Pressable
+    <LiquidGlassPressable
       onPress={onPress}
       disabled={inactive}
-      style={({ pressed }) => [
-        styles.btn,
-        { backgroundColor: colors.accent, opacity: inactive ? 0.45 : pressed ? 0.9 : 1 },
-      ]}
-      accessibilityRole="button"
+      variant="primary"
+      minHeight={52}
     >
       {loading ? (
-        <ActivityIndicator color={colors.onAccent} />
+        <ActivityIndicator color={colors.text} />
       ) : (
-        <Text style={[styles.label, { color: colors.onAccent }]}>{title}</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{title}</Text>
       )}
-    </Pressable>
+    </LiquidGlassPressable>
   );
 }
 
 const styles = StyleSheet.create({
-  btn: {
-    minHeight: 52,
-    borderRadius: radii.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.lg,
-    borderWidth: 0,
-    ...(Platform.OS === 'web' ? { outlineWidth: 0, outlineColor: 'transparent' } : {}),
-  },
   label: {
     fontSize: 17,
     fontWeight: '600',
+    paddingHorizontal: spacing.sm,
   },
 });

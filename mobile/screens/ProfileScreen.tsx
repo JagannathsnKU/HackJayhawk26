@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import {
   Alert,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,12 +13,13 @@ import type { RootStackScreenProps } from '../navigation/types';
 import { navigationRef } from '../navigation/navigationRef';
 import { useAuth } from '../context/AuthContext';
 import { useAppState } from '../context/AppProvider';
-import { radii, screenPaddingX, spacing, useAppTheme } from '../utils/theme';
+import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { SecondaryButton } from '../components/SecondaryButton';
 import { SectionHeader } from '../components/SectionHeader';
 import { NexusBrandLine } from '../components/NexusBrandLine';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 
 type Props = RootStackScreenProps<'Profile'>;
 
@@ -92,22 +92,18 @@ export function ProfileScreen({}: Props) {
         {MODULES.map((m) => {
           const on = active === m.id;
           return (
-            <Pressable
+            <LiquidGlassPressable
               key={m.id}
               onPress={() => setActive(m.id)}
-              style={[
-                styles.hubTile,
-                {
-                  borderColor: on ? colors.accent : colors.border,
-                  backgroundColor: on ? colors.accentMuted : colors.surfaceElevated,
-                },
-              ]}
-              accessibilityRole="button"
+              variant={on ? 'chipActive' : 'chip'}
+              minHeight={56}
+              pressableStyle={styles.hubTilePress}
+              innerStyle={styles.hubTileInner}
               accessibilityState={{ selected: on }}
             >
-              <Text style={[styles.hubLabel, { color: on ? colors.accent : colors.text }]}>{m.label}</Text>
+              <Text style={[styles.hubLabel, { color: colors.text }]}>{m.label}</Text>
               <Text style={[styles.hubHint, { color: colors.textMuted }]}>{m.hint}</Text>
-            </Pressable>
+            </LiquidGlassPressable>
           );
         })}
       </View>
@@ -138,9 +134,15 @@ export function ProfileScreen({}: Props) {
             <Text style={[styles.mono, { color: colors.text }]} selectable>
               {shortDid}
             </Text>
-            <Pressable onPress={copyDid} style={styles.linkRow} accessibilityRole="button">
-              <Text style={[styles.link, { color: colors.accent }]}>Copy / verify (demo)</Text>
-            </Pressable>
+            <LiquidGlassPressable
+              onPress={copyDid}
+              variant="secondary"
+              minHeight={44}
+              pressableStyle={{ alignSelf: 'flex-start' }}
+              innerStyle={styles.linkRowInner}
+            >
+              <Text style={[styles.link, { color: colors.text }]}>Copy / verify (demo)</Text>
+            </LiquidGlassPressable>
           </Card>
         ) : null}
 
@@ -200,21 +202,17 @@ export function ProfileScreen({}: Props) {
             <Text style={[styles.label, { color: colors.textMuted }]}>Token</Text>
             <View style={styles.tokenRow}>
               {(['RLUSD', 'XRP'] as const).map((t) => (
-                <Pressable
+                <LiquidGlassPressable
                   key={t}
                   onPress={() => setSendAsset(t)}
-                  style={[
-                    styles.tokenChip,
-                    {
-                      backgroundColor: sendAsset === t ? colors.accentMuted : colors.surfaceElevated,
-                      borderColor: sendAsset === t ? colors.accent : colors.border,
-                    },
-                  ]}
-                  accessibilityRole="button"
+                  variant={sendAsset === t ? 'chipActive' : 'chip'}
+                  minHeight={40}
+                  pressableStyle={styles.tokenChipWrap}
+                  innerStyle={styles.tokenChipInner}
                   accessibilityState={{ selected: sendAsset === t }}
                 >
-                  <Text style={[styles.tokenChipText, { color: sendAsset === t ? colors.accent : colors.text }]}>{t}</Text>
-                </Pressable>
+                  <Text style={[styles.tokenChipText, { color: colors.text }]}>{t}</Text>
+                </LiquidGlassPressable>
               ))}
             </View>
             <Text style={[styles.label, { color: colors.textMuted, marginTop: spacing.md }]}>Amount</Text>
@@ -295,19 +293,18 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.md,
     gap: spacing.sm,
   },
-  hubTile: {
-    width: '47%',
-    borderRadius: radii.md,
-    borderWidth: StyleSheet.hairlineWidth,
+  hubTilePress: { width: '47%' },
+  hubTileInner: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.sm,
     gap: 4,
+    alignItems: 'flex-start',
   },
   hubLabel: { fontSize: 18, fontWeight: '700' },
   hubHint: { fontSize: 12, fontWeight: '500' },
   label: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 6 },
   mono: { fontSize: 13, lineHeight: 20 },
-  linkRow: { alignSelf: 'flex-start', marginTop: spacing.sm },
+  linkRowInner: { marginTop: spacing.sm, paddingVertical: 10, paddingHorizontal: spacing.md },
   link: { fontSize: 15, fontWeight: '600' },
   kv: { gap: spacing.md },
   row: { gap: 4 },
@@ -315,12 +312,8 @@ const styles = StyleSheet.create({
   rowValue: { fontSize: 16, fontWeight: '600' },
   rowValueBig: { fontSize: 20, fontWeight: '700' },
   tokenRow: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xs },
-  tokenChip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
+  tokenChipWrap: { flex: 1 },
+  tokenChipInner: { paddingVertical: 8, paddingHorizontal: spacing.md },
   tokenChipText: { fontSize: 15, fontWeight: '600' },
   input: {
     marginTop: spacing.xs,

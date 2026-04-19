@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { Card } from '../components/Card';
 import { NexusBrandLine } from '../components/NexusBrandLine';
-import { radii, screenPaddingX, spacing, useAppTheme } from '../utils/theme';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
+import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'TravelRouting'>;
 
@@ -64,19 +65,18 @@ export function TravelRoutingScreen({}: Props) {
         ).map((tab) => {
           const on = phase === tab.id;
           return (
-            <Pressable
+            <LiquidGlassPressable
               key={tab.id}
               onPress={() => setPhase(tab.id)}
-              style={[
-                styles.tab,
-                {
-                  borderColor: on ? colors.accent : colors.border,
-                  backgroundColor: on ? colors.accentMuted : colors.surface,
-                },
-              ]}
+              variant={on ? 'chipActive' : 'chip'}
+              minHeight={42}
+              pressableStyle={styles.tabWrap}
+              innerStyle={styles.tabInner}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: on }}
             >
-              <Text style={[styles.tabText, { color: on ? colors.accent : colors.textMuted }]}>{tab.label}</Text>
-            </Pressable>
+              <Text style={[styles.tabText, { color: on ? colors.text : colors.textMuted }]}>{tab.label}</Text>
+            </LiquidGlassPressable>
           );
         })}
       </View>
@@ -96,15 +96,11 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   body: { paddingHorizontal: screenPaddingX, paddingTop: spacing.md, paddingBottom: spacing.xl * 2, gap: spacing.md },
   pageTitle: { fontSize: 22, fontWeight: '800' },
-  tabs: { flexDirection: 'row', gap: spacing.sm, flexWrap: 'wrap' },
-  tab: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.pill,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  tabText: { fontSize: 13, fontWeight: '800' },
-  phaseTitle: { fontSize: 18, fontWeight: '800', marginTop: spacing.sm },
+  tabs: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  tabWrap: { flex: 1, minWidth: 100 },
+  tabInner: { paddingVertical: 10, paddingHorizontal: spacing.sm },
+  tabText: { fontSize: 13, fontWeight: '700', textAlign: 'center' },
+  phaseTitle: { fontSize: 17, fontWeight: '800', marginTop: spacing.sm },
   stepT: { fontSize: 16, fontWeight: '700' },
   stepS: { fontSize: 14, lineHeight: 20 },
 });

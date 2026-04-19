@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
@@ -7,6 +7,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { TravelHistoryMap } from '../components/TravelHistoryMap';
 import { NexusBrandLine } from '../components/NexusBrandLine';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { SAMPLE_ITINERARIES } from '../utils/sampleItineraries';
 
@@ -71,18 +72,24 @@ export function BadgesScreen({}: Props) {
 
         <Text style={[styles.section, { color: colors.textMuted }]}>Photos</Text>
         <View style={styles.pickRow}>
-          <Pressable
+          <LiquidGlassPressable
             onPress={() => void addFromLibrary()}
-            style={[styles.pickBtn, { borderColor: colors.accent, backgroundColor: colors.accentMuted }]}
+            variant="tileAccent"
+            minHeight={48}
+            pressableStyle={styles.pickFlex}
+            innerStyle={styles.pickInner}
           >
-            <Text style={[styles.pickBtnText, { color: colors.accent }]}>Library</Text>
-          </Pressable>
-          <Pressable
+            <Text style={[styles.pickBtnText, { color: colors.text }]}>Library</Text>
+          </LiquidGlassPressable>
+          <LiquidGlassPressable
             onPress={() => void addFromFiles()}
-            style={[styles.pickBtn, { borderColor: colors.border, backgroundColor: colors.surface }]}
+            variant="tile"
+            minHeight={48}
+            pressableStyle={styles.pickFlex}
+            innerStyle={styles.pickInner}
           >
             <Text style={[styles.pickBtnText, { color: colors.text }]}>Files</Text>
-          </Pressable>
+          </LiquidGlassPressable>
         </View>
 
         <View style={styles.photoRow}>
@@ -124,12 +131,8 @@ const styles = StyleSheet.create({
   badgeTitle: { fontSize: 16, fontWeight: '800' },
   section: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase' },
   pickRow: { flexDirection: 'row', gap: spacing.sm },
-  pickBtn: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
+  pickFlex: { flex: 1 },
+  pickInner: { paddingVertical: 10, paddingHorizontal: spacing.md },
   pickBtnText: { fontSize: 14, fontWeight: '800' },
   photoRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   photoCard: { width: '47%', borderRadius: 14, borderWidth: StyleSheet.hairlineWidth, overflow: 'hidden' },

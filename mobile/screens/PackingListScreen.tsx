@@ -1,10 +1,11 @@
 import React, { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { Card } from '../components/Card';
 import { NexusBrandLine } from '../components/NexusBrandLine';
 import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PackingList'>;
 
@@ -58,10 +59,12 @@ export function PackingListScreen({}: Props) {
           {g.items.map((it) => {
             const checked = Boolean(done[it.id]);
             return (
-              <Pressable
+              <LiquidGlassPressable
                 key={it.id}
                 onPress={() => toggle(it.id)}
-                style={styles.row}
+                variant={checked ? 'tileAccent' : 'tile'}
+                minHeight={52}
+                innerStyle={styles.rowInner}
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked }}
               >
@@ -84,7 +87,7 @@ export function PackingListScreen({}: Props) {
                 >
                   {it.label}
                 </Text>
-              </Pressable>
+              </LiquidGlassPressable>
             );
           })}
         </Card>
@@ -98,7 +101,13 @@ const styles = StyleSheet.create({
   body: { paddingHorizontal: screenPaddingX, paddingTop: spacing.md, paddingBottom: spacing.xl * 2, gap: spacing.md },
   pageTitle: { fontSize: 22, fontWeight: '800' },
   groupTitle: { fontSize: 16, fontWeight: '800' },
-  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  rowInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
   box: {
     width: 22,
     height: 22,

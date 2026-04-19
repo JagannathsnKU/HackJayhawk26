@@ -1,6 +1,7 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { radii, spacing, useAppTheme } from '../utils/theme';
+import { StyleSheet, Text } from 'react-native';
+import { LiquidGlassPressable } from './LiquidGlassPressable';
+import { spacing, useAppTheme } from '../utils/theme';
 
 type Props = {
   title: string;
@@ -15,39 +16,33 @@ type Props = {
 export function HubTile({ title, subtitle, icon, onPress, variant = 'default', compact }: Props) {
   const colors = useAppTheme();
   const elevated = variant === 'accent';
+  const minH = compact && !subtitle ? 76 : 100;
 
   return (
-    <Pressable
+    <LiquidGlassPressable
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.tile,
-        compact && !subtitle ? styles.tileCompact : null,
-        {
-          borderColor: elevated ? colors.accent : colors.border,
-          backgroundColor: elevated ? colors.accentMuted : colors.surface,
-          opacity: pressed ? 0.88 : 1,
-        },
+      variant={elevated ? 'tileAccent' : 'tile'}
+      minHeight={minH}
+      innerStyle={[
+        styles.inner,
+        compact && !subtitle ? styles.innerCompact : null,
       ]}
-      accessibilityRole="button"
     >
       {icon ? <Text style={[styles.icon, { color: colors.accent }]}>{icon}</Text> : null}
       <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
       {subtitle ? <Text style={[styles.sub, { color: colors.textSecondary }]}>{subtitle}</Text> : null}
-    </Pressable>
+    </LiquidGlassPressable>
   );
 }
 
 const styles = StyleSheet.create({
-  tile: {
-    borderRadius: radii.lg,
-    borderWidth: StyleSheet.hairlineWidth,
+  inner: {
+    alignItems: 'flex-start',
+    justifyContent: 'center',
     padding: spacing.lg,
     gap: 6,
-    minHeight: 100,
-    justifyContent: 'center',
   },
-  tileCompact: {
-    minHeight: 76,
+  innerCompact: {
     paddingVertical: spacing.md,
   },
   icon: { fontSize: 22, fontWeight: '700', marginBottom: 2 },

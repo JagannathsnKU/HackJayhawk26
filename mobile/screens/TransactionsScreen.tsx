@@ -1,14 +1,15 @@
 import React, { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { RootStackScreenProps } from '../navigation/types';
 import type { HookDecision, HookTransactionEvent } from '../models/types';
 import { useAppState } from '../context/AppProvider';
-import { radii, screenPaddingX, spacing, useAppTheme } from '../utils/theme';
+import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
 import { DrillDownModal } from '../components/DrillDownModal';
 import { SectionHeader } from '../components/SectionHeader';
 import { NexusBrandLine } from '../components/NexusBrandLine';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 
 type Props = RootStackScreenProps<'Transactions'>;
 
@@ -41,41 +42,31 @@ export function TransactionsScreen({}: Props) {
               { id: 'pending' as const, label: 'Pending' },
             ] as const
           ).map((f) => (
-            <Pressable
+            <LiquidGlassPressable
               key={f.id}
               onPress={() => setFilter(f.id)}
-              style={[
-                styles.filterChip,
-                {
-                  backgroundColor: filter === f.id ? colors.accentMuted : colors.surfaceElevated,
-                  borderColor: filter === f.id ? colors.accent : colors.border,
-                },
-              ]}
-              accessibilityRole="button"
+              variant={filter === f.id ? 'chipActive' : 'chip'}
+              minHeight={40}
+              pressableStyle={styles.filterChipWrap}
+              innerStyle={styles.filterChipInner}
               accessibilityState={{ selected: filter === f.id }}
             >
-              <Text style={[styles.filterLabel, { color: filter === f.id ? colors.accent : colors.textMuted }]}>
+              <Text style={[styles.filterLabel, { color: filter === f.id ? colors.text : colors.textMuted }]}>
                 {f.label}
               </Text>
-            </Pressable>
+            </LiquidGlassPressable>
           ))}
         </View>
 
         <View style={styles.section}>
           <SectionHeader title="Case files" subtitle="One line per spend — tap for hook trace." />
           {filtered.map((ev) => (
-            <Pressable
+            <LiquidGlassPressable
               key={ev.id}
               onPress={() => setDetail(ev)}
-              style={({ pressed }) => [
-                styles.compactRow,
-                {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  opacity: pressed ? 0.9 : 1,
-                },
-              ]}
-              accessibilityRole="button"
+              variant="tile"
+              minHeight={56}
+              innerStyle={styles.compactRowInner}
             >
               <View style={styles.compactLeft}>
                 <DecisionDot decision={ev.decision} colors={colors} />
@@ -89,7 +80,7 @@ export function TransactionsScreen({}: Props) {
                 </View>
               </View>
               <Text style={[styles.chev, { color: colors.textMuted }]}>→</Text>
-            </Pressable>
+            </LiquidGlassPressable>
           ))}
         </View>
 
@@ -148,20 +139,15 @@ const styles = StyleSheet.create({
   title: { fontSize: 26, fontWeight: '700', marginTop: 4, letterSpacing: -0.4 },
   sub: { fontSize: 15, lineHeight: 22, marginTop: spacing.sm },
   filterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.lg },
-  filterChip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.pill,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
+  filterChipWrap: { alignSelf: 'flex-start' },
+  filterChipInner: { paddingVertical: 8, paddingHorizontal: spacing.md },
   filterLabel: { fontSize: 13, fontWeight: '700' },
   section: { marginTop: spacing.lg, gap: spacing.sm },
-  compactRow: {
+  compactRowInner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderRadius: radii.md,
-    borderWidth: StyleSheet.hairlineWidth,
+    width: '100%',
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
     gap: spacing.sm,

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { NexusBrandLine } from '../components/NexusBrandLine';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'BookingHub'>;
@@ -37,7 +38,7 @@ export function BookingHubScreen({ navigation }: Props) {
 
       <Text style={[styles.section, { color: colors.textMuted }]}>Flights</Text>
       {FLIGHTS.map((r) => (
-        <Pressable
+        <LiquidGlassPressable
           key={r.id}
           onPress={() =>
             navigation.navigate('PaymentApproval', {
@@ -46,13 +47,9 @@ export function BookingHubScreen({ navigation }: Props) {
               policyState: 'within_policy',
             })
           }
-          style={[
-            styles.row,
-            {
-              borderColor: r.best ? colors.accent : colors.border,
-              backgroundColor: r.best ? colors.accentMuted : colors.surface,
-            },
-          ]}
+          variant={r.best ? 'tileAccent' : 'tile'}
+          minHeight={76}
+          innerStyle={styles.rowInner}
         >
           <View style={{ flex: 1 }}>
             {r.best ? (
@@ -62,12 +59,12 @@ export function BookingHubScreen({ navigation }: Props) {
             <Text style={[styles.rowMeta, { color: colors.textSecondary }]}>{r.meta}</Text>
           </View>
           <Text style={[styles.price, { color: colors.text }]}>{r.price}</Text>
-        </Pressable>
+        </LiquidGlassPressable>
       ))}
 
       <Text style={[styles.section, { color: colors.textMuted }]}>Hotels</Text>
       {HOTELS.map((r) => (
-        <Pressable
+        <LiquidGlassPressable
           key={r.id}
           onPress={() =>
             navigation.navigate('PaymentApproval', {
@@ -76,13 +73,9 @@ export function BookingHubScreen({ navigation }: Props) {
               policyState: r.id === 'h3' ? 'requires_approval' : 'within_policy',
             })
           }
-          style={[
-            styles.row,
-            {
-              borderColor: r.best ? colors.accent : colors.border,
-              backgroundColor: r.best ? colors.accentMuted : colors.surface,
-            },
-          ]}
+          variant={r.best ? 'tileAccent' : 'tile'}
+          minHeight={76}
+          innerStyle={styles.rowInner}
         >
           <View style={{ flex: 1 }}>
             {r.best ? <Text style={[styles.badge, { color: colors.accent }]}>AI pick</Text> : null}
@@ -90,7 +83,7 @@ export function BookingHubScreen({ navigation }: Props) {
             <Text style={[styles.rowMeta, { color: colors.textSecondary }]}>{r.meta}</Text>
           </View>
           <Text style={[styles.price, { color: colors.text }]}>{r.price}</Text>
-        </Pressable>
+        </LiquidGlassPressable>
       ))}
 
       <PrimaryButton
@@ -118,13 +111,12 @@ const styles = StyleSheet.create({
   title: { fontSize: 22, fontWeight: '800', letterSpacing: -0.3 },
   hint: { fontSize: 12, lineHeight: 16 },
   section: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase', marginTop: spacing.sm },
-  row: {
+  rowInner: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    padding: spacing.md,
-    borderRadius: 14,
-    borderWidth: StyleSheet.hairlineWidth,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
   },
   badge: { fontSize: 11, fontWeight: '800', marginBottom: 4 },
   rowTitle: { fontSize: 16, fontWeight: '700' },

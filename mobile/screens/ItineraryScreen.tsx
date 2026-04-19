@@ -3,7 +3,6 @@ import {
   Dimensions,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,8 +14,8 @@ import { useAppState } from '../context/AppProvider';
 import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
 import { StatusBadge } from '../components/StatusBadge';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 import type { ItineraryItem } from '../models/types';
-import { radii } from '../utils/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Itinerary'>;
 
@@ -64,11 +63,13 @@ export function ItineraryScreen({ navigation }: Props) {
         onMomentumScrollEnd={onScroll}
       >
         {itinerary.map((item) => (
-          <Pressable
+          <LiquidGlassPressable
             key={item.id}
             onPress={() => navigation.navigate('ItemDetail', { itemId: item.id })}
-            style={[styles.carouselCard, { width: cardW, borderColor: colors.border, backgroundColor: colors.surface }]}
-            accessibilityRole="button"
+            variant="tile"
+            minHeight={220}
+            pressableStyle={{ width: cardW }}
+            innerStyle={styles.carouselInner}
           >
             <View style={styles.cardTop}>
               <Text style={[styles.kind, { color: colors.textMuted }]}>{kindLabel(item.kind)}</Text>
@@ -84,7 +85,7 @@ export function ItineraryScreen({ navigation }: Props) {
               {item.location}
             </Text>
             <Text style={[styles.tapHint, { color: colors.accent }]}>Open details →</Text>
-          </Pressable>
+          </LiquidGlassPressable>
         ))}
       </ScrollView>
 
@@ -107,12 +108,15 @@ export function ItineraryScreen({ navigation }: Props) {
             {current.title}
           </Text>
           <View style={styles.quickRow}>
-            <Pressable
+            <LiquidGlassPressable
               onPress={() => navigation.navigate('ItemDetail', { itemId: current.id })}
-              style={[styles.miniBtn, { borderColor: colors.border }]}
+              variant="secondary"
+              minHeight={42}
+              pressableStyle={{ alignSelf: 'flex-start' }}
+              innerStyle={styles.miniBtnInner}
             >
               <Text style={[styles.miniBtnText, { color: colors.text }]}>Full detail</Text>
-            </Pressable>
+            </LiquidGlassPressable>
           </View>
         </View>
       ) : null}
@@ -138,11 +142,9 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   intro: { fontSize: 14, lineHeight: 20, marginBottom: spacing.md },
   hScroll: { paddingBottom: spacing.md },
-  carouselCard: {
-    borderRadius: radii.lg,
-    borderWidth: StyleSheet.hairlineWidth,
+  carouselInner: {
+    alignItems: 'flex-start',
     padding: spacing.lg,
-    minHeight: 220,
     gap: 6,
   },
   cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -158,11 +160,9 @@ const styles = StyleSheet.create({
   focusKicker: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase' },
   focusTitle: { fontSize: 17, fontWeight: '700' },
   quickRow: { flexDirection: 'row', marginTop: spacing.xs },
-  miniBtn: {
-    paddingVertical: spacing.sm,
+  miniBtnInner: {
+    paddingVertical: 10,
     paddingHorizontal: spacing.md,
-    borderRadius: radii.md,
-    borderWidth: StyleSheet.hairlineWidth,
   },
   miniBtnText: { fontSize: 14, fontWeight: '600' },
 });

@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { companionLaneLabel, type AppNotification } from '../models/types';
 import { useAppState } from '../context/AppProvider';
 import { radii, screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { DrillDownModal } from '../components/DrillDownModal';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Notifications'>;
 
@@ -38,40 +39,31 @@ export function NotificationsScreen({}: Props) {
               { id: 'trip' as const, label: 'Trip' },
             ] as const
           ).map((f) => (
-            <Pressable
+            <LiquidGlassPressable
               key={f.id}
               onPress={() => setFilter(f.id)}
-              style={[
-                styles.filterChip,
-                {
-                  backgroundColor: filter === f.id ? colors.accentMuted : colors.surfaceElevated,
-                  borderColor: filter === f.id ? colors.accent : colors.border,
-                },
-              ]}
-              accessibilityRole="button"
+              variant={filter === f.id ? 'chipActive' : 'chip'}
+              minHeight={40}
+              pressableStyle={styles.filterChipWrap}
+              innerStyle={styles.filterChipInner}
               accessibilityState={{ selected: filter === f.id }}
             >
-              <Text style={[styles.filterLabel, { color: filter === f.id ? colors.accent : colors.textMuted }]}>
+              <Text style={[styles.filterLabel, { color: filter === f.id ? colors.text : colors.textMuted }]}>
                 {f.label}
               </Text>
-            </Pressable>
+            </LiquidGlassPressable>
           ))}
         </View>
 
         <View style={styles.grid}>
           {filtered.map((n) => (
-            <Pressable
+            <LiquidGlassPressable
               key={n.id}
               onPress={() => setSelected(n)}
-              style={({ pressed }) => [
-                styles.tile,
-                {
-                  backgroundColor: colors.surface,
-                  borderColor: n.read ? colors.border : colors.accent,
-                  opacity: pressed ? 0.88 : 1,
-                },
-              ]}
-              accessibilityRole="button"
+              variant={n.read ? 'tile' : 'tileAccent'}
+              minHeight={128}
+              pressableStyle={styles.tilePress}
+              innerStyle={styles.tileInner}
             >
               {n.lane ? (
                 <View style={[styles.tileTag, { backgroundColor: colors.accentMuted }]}>
@@ -86,7 +78,7 @@ export function NotificationsScreen({}: Props) {
                 {n.title}
               </Text>
               <Text style={[styles.tileTime, { color: colors.textMuted }]}>{n.timeLabel}</Text>
-            </Pressable>
+            </LiquidGlassPressable>
           ))}
         </View>
       </ScrollView>
@@ -115,27 +107,23 @@ const styles = StyleSheet.create({
   },
   intro: { fontSize: 14, lineHeight: 20, marginBottom: spacing.md },
   filterRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.lg, flexWrap: 'wrap' },
-  filterChip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radii.pill,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
+  filterChipWrap: { alignSelf: 'flex-start' },
+  filterChipInner: { paddingVertical: 8, paddingHorizontal: spacing.md },
   filterLabel: { fontSize: 13, fontWeight: '700' },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
   },
-  tile: {
+  tilePress: {
     width: '48%',
     flexGrow: 1,
-    minHeight: 128,
     maxWidth: '48%',
-    borderRadius: radii.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    padding: spacing.md,
+  },
+  tileInner: {
+    alignItems: 'flex-start',
     justifyContent: 'flex-start',
+    padding: spacing.md,
     gap: spacing.sm,
   },
   tileTag: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 3, borderRadius: radii.pill },

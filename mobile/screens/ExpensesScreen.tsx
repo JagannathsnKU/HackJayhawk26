@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   LayoutAnimation,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,7 +15,7 @@ import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
 import { ProgressBar } from '../components/ProgressBar';
 import { SectionHeader } from '../components/SectionHeader';
-import { radii } from '../utils/theme';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -71,17 +70,12 @@ export function ExpensesScreen({}: Props) {
           {LINES.map((line) => {
             const expanded = openId === line.id;
             return (
-              <Pressable
+              <LiquidGlassPressable
                 key={line.id}
                 onPress={() => toggle(line.id)}
-                style={[
-                  styles.tile,
-                  {
-                    borderColor: expanded ? colors.accent : colors.border,
-                    backgroundColor: expanded ? colors.accentMuted : colors.surface,
-                  },
-                ]}
-                accessibilityRole="button"
+                variant={expanded ? 'tileAccent' : 'tile'}
+                minHeight={expanded ? 100 : 72}
+                innerStyle={styles.tileInner}
                 accessibilityState={{ expanded }}
               >
                 <View style={styles.tileTop}>
@@ -95,7 +89,7 @@ export function ExpensesScreen({}: Props) {
                     {line.detail}
                   </Text>
                 )}
-              </Pressable>
+              </LiquidGlassPressable>
             );
           })}
         </View>
@@ -115,9 +109,8 @@ const styles = StyleSheet.create({
   },
   note: { fontSize: 13, lineHeight: 18, marginTop: spacing.md },
   tiles: { gap: spacing.sm },
-  tile: {
-    borderRadius: radii.lg,
-    borderWidth: StyleSheet.hairlineWidth,
+  tileInner: {
+    alignItems: 'stretch',
     padding: spacing.md,
     gap: spacing.sm,
   },

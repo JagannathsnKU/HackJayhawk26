@@ -1,8 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import type { SampleItinerary } from '../utils/sampleItineraries';
 import { radii, spacing, useAppTheme } from '../utils/theme';
 import { Card } from './Card';
+import { LiquidGlassPressable } from './LiquidGlassPressable';
 
 type Props = {
   itinerary: SampleItinerary;
@@ -60,16 +61,12 @@ export function SampleItineraryChecklist({ itinerary, mode = 'checklist' }: Prop
             );
           }
           return (
-            <Pressable
+            <LiquidGlassPressable
               key={act.id}
               onPress={() => toggle(act.id)}
-              style={[
-                styles.row,
-                {
-                  borderColor: checked ? colors.accent : colors.border,
-                  backgroundColor: checked ? colors.accentMuted : colors.surfaceElevated,
-                },
-              ]}
+              variant={checked ? 'tileAccent' : 'tile'}
+              minHeight={64}
+              innerStyle={styles.rowInner}
               accessibilityRole="checkbox"
               accessibilityState={{ checked }}
             >
@@ -85,7 +82,7 @@ export function SampleItineraryChecklist({ itinerary, mode = 'checklist' }: Prop
                   <Text style={[styles.detail, { color: colors.textSecondary }]}>{act.detail}</Text>
                 ) : null}
               </View>
-            </Pressable>
+            </LiquidGlassPressable>
           );
         })}
       </View>
@@ -107,6 +104,12 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderRadius: radii.md,
     borderWidth: StyleSheet.hairlineWidth,
+    alignItems: 'flex-start',
+  },
+  rowInner: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    padding: spacing.md,
     alignItems: 'flex-start',
   },
   box: {

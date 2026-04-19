@@ -1,5 +1,6 @@
 import React from 'react';
-import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { LiquidGlassPressable } from './LiquidGlassPressable';
 import { radii, spacing, useAppTheme } from '../utils/theme';
 
 type Props = {
@@ -11,7 +12,21 @@ type Props = {
 
 export function Card({ children, onPress, style, padded = true }: Props) {
   const colors = useAppTheme();
-  const inner = (
+
+  if (onPress) {
+    return (
+      <LiquidGlassPressable
+        onPress={onPress}
+        variant="tile"
+        pressableStyle={[{ alignSelf: 'stretch' }, style]}
+        innerStyle={[padded && styles.padded, { alignItems: 'stretch', justifyContent: 'flex-start' }]}
+      >
+        {children}
+      </LiquidGlassPressable>
+    );
+  }
+
+  return (
     <View
       style={[
         styles.box,
@@ -23,20 +38,6 @@ export function Card({ children, onPress, style, padded = true }: Props) {
       {children}
     </View>
   );
-
-  if (onPress) {
-    return (
-      <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [pressed && { opacity: 0.92 }]}
-        accessibilityRole="button"
-      >
-        {inner}
-      </Pressable>
-    );
-  }
-
-  return inner;
 }
 
 const styles = StyleSheet.create({

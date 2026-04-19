@@ -1,12 +1,13 @@
 import React, { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { useAppState } from '../context/AppProvider';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { NexusBrandLine } from '../components/NexusBrandLine';
 import { SampleItineraryChecklist } from '../components/SampleItineraryChecklist';
-import { radii, screenPaddingX, spacing, useAppTheme } from '../utils/theme';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
+import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { sampleItineraryFromTrip } from '../utils/sampleItineraries';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CurrentBookings'>;
@@ -39,16 +40,12 @@ export function CurrentBookingsScreen({ navigation }: Props) {
           {itinerary.map((item) => {
             const ok = Boolean(confirmed[item.id]);
             return (
-              <Pressable
+              <LiquidGlassPressable
                 key={item.id}
                 onPress={() => toggle(item.id)}
-                style={[
-                  styles.row,
-                  {
-                    borderColor: ok ? colors.accent : colors.border,
-                    backgroundColor: ok ? colors.accentMuted : colors.surface,
-                  },
-                ]}
+                variant={ok ? 'tileAccent' : 'tile'}
+                minHeight={72}
+                innerStyle={styles.rowInner}
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: ok }}
               >
@@ -64,13 +61,16 @@ export function CurrentBookingsScreen({ navigation }: Props) {
                   <Text style={[styles.title, { color: colors.text }]}>{item.title}</Text>
                   <Text style={[styles.meta, { color: colors.textSecondary }]}>{item.subtitle}</Text>
                 </View>
-                <Pressable
+                <LiquidGlassPressable
                   onPress={() => navigation.navigate('ItemDetail', { itemId: item.id })}
-                  style={[styles.detailBtn, { borderColor: colors.border }]}
+                  variant="secondary"
+                  minHeight={40}
+                  pressableStyle={styles.detailPress}
+                  innerStyle={styles.detailInner}
                 >
-                  <Text style={{ color: colors.accent, fontWeight: '700' }}>Details</Text>
-                </Pressable>
-              </Pressable>
+                  <Text style={{ color: colors.text, fontWeight: '700' }}>Details</Text>
+                </LiquidGlassPressable>
+              </LiquidGlassPressable>
             );
           })}
 
@@ -91,24 +91,24 @@ const styles = StyleSheet.create({
   body: { paddingHorizontal: screenPaddingX, paddingTop: spacing.md, paddingBottom: spacing.xl * 2, gap: spacing.md },
   pageTitle: { fontSize: 22, fontWeight: '800' },
   sub: { fontSize: 11, fontWeight: '800', letterSpacing: 0.4, textTransform: 'uppercase' },
-  row: {
+  rowInner: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: radii.lg,
-    padding: spacing.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
   },
   box: {
-    width: 24,
-    height: 24,
+    width: 26,
+    height: 26,
     borderRadius: 6,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  check: { color: '#041018', fontSize: 14, fontWeight: '900' },
-  title: { fontSize: 16, fontWeight: '700' },
+  check: { color: '#000', fontWeight: '900', fontSize: 14 },
+  title: { fontSize: 16, fontWeight: '800' },
   meta: { fontSize: 13, marginTop: 2 },
-  detailBtn: { paddingHorizontal: spacing.sm, paddingVertical: 6, borderRadius: radii.md, borderWidth: StyleSheet.hairlineWidth },
+  detailPress: { flexShrink: 0 },
+  detailInner: { paddingVertical: 8, paddingHorizontal: spacing.sm },
 });

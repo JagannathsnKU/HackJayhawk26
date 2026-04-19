@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
@@ -12,6 +12,7 @@ import { PrimaryButton } from '../components/PrimaryButton';
 import { SecondaryButton } from '../components/SecondaryButton';
 import { NexusBrandLine } from '../components/NexusBrandLine';
 import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CurrentTrip'>;
 
@@ -55,10 +56,13 @@ export function CurrentTripScreen({ navigation }: Props) {
             </Card>
           ) : (
             scans.map((n) => (
-              <Pressable
+              <LiquidGlassPressable
                 key={n.id}
                 onPress={() => navigation.navigate('Notifications')}
-                style={[styles.insight, { borderColor: colors.border, backgroundColor: colors.surface }]}
+                variant="tile"
+                minHeight={120}
+                pressableStyle={styles.insightWrap}
+                innerStyle={styles.insightInner}
               >
                 {n.lane ? (
                   <Text style={[styles.pill, { color: colors.accent }]}>{companionLaneLabel(n.lane)}</Text>
@@ -69,7 +73,7 @@ export function CurrentTripScreen({ navigation }: Props) {
                 <Text style={[styles.insBody, { color: colors.textSecondary }]} numberOfLines={2}>
                   {n.body}
                 </Text>
-              </Pressable>
+              </LiquidGlassPressable>
             ))
           )}
         </ScrollView>
@@ -113,10 +117,9 @@ const styles = StyleSheet.create({
   section: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase', marginTop: spacing.sm },
   scanHint: { fontSize: 13, lineHeight: 19 },
   carousel: { gap: spacing.sm, paddingVertical: 4 },
-  insight: {
-    width: 240,
-    borderRadius: 14,
-    borderWidth: StyleSheet.hairlineWidth,
+  insightWrap: { width: 240 },
+  insightInner: {
+    alignItems: 'flex-start',
     padding: spacing.md,
     gap: 6,
   },

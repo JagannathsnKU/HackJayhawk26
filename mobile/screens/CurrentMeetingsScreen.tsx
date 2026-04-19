@@ -1,11 +1,12 @@
 import React from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { useAppState } from '../context/AppProvider';
 import { Card } from '../components/Card';
 import { NexusBrandLine } from '../components/NexusBrandLine';
 import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
+import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CurrentMeetings'>;
 
@@ -44,12 +45,15 @@ export function CurrentMeetingsScreen({}: Props) {
                 · {b}
               </Text>
             ))}
-            <Pressable
-              onPress={() => Linking.openURL('https://calendar.google.com')}
-              style={[styles.link, { borderColor: colors.border }]}
+            <LiquidGlassPressable
+              onPress={() => void Linking.openURL('https://calendar.google.com')}
+              variant="secondary"
+              minHeight={44}
+              pressableStyle={{ alignSelf: 'flex-start' }}
+              innerStyle={styles.linkInner}
             >
-              <Text style={{ color: colors.accent, fontWeight: '700' }}>Open calendar (external)</Text>
-            </Pressable>
+              <Text style={{ color: colors.text, fontWeight: '700' }}>Open calendar (external)</Text>
+            </LiquidGlassPressable>
           </Card>
         ))
       )}
@@ -66,12 +70,9 @@ const styles = StyleSheet.create({
   time: { fontSize: 14, fontWeight: '700' },
   loc: { fontSize: 15, fontWeight: '600' },
   bullet: { fontSize: 14, lineHeight: 20 },
-  link: {
-    alignSelf: 'flex-start',
+  linkInner: {
     marginTop: spacing.sm,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
+    paddingVertical: 10,
   },
 });
