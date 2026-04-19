@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
   ScrollView,
@@ -20,6 +20,7 @@ import { SecondaryButton } from '../components/SecondaryButton';
 import { SectionHeader } from '../components/SectionHeader';
 import { NexusBrandLine } from '../components/NexusBrandLine';
 import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
+import { backendFetch } from '../services/apiClient';
 
 type Props = RootStackScreenProps<'Profile'>;
 
@@ -35,7 +36,7 @@ const MODULES: { id: ModuleId; label: string; hint: string }[] = [
 
 export function ProfileScreen({}: Props) {
   const colors = useAppTheme();
-  const { signOut, user: authUser } = useAuth();
+  const { signOut } = useAuth();
   const { user, loading, wallet } = useAppState();
   const [active, setActive] = useState<ModuleId>('did');
   const [sendAmount, setSendAmount] = useState('');
@@ -43,16 +44,108 @@ export function ProfileScreen({}: Props) {
   const [sendAsset, setSendAsset] = useState<'RLUSD' | 'XRP'>('RLUSD');
   const [sendBusy, setSendBusy] = useState(false);
 
+  // XLS-40: real DID + Verifiable Presentation from agent hot wallet
+  const [realDid, setRealDid] = useState<string | null>(null);
+  const [vpStatus, setVpStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle');
+  const [vpProof, setVpProof] = useState<string | null>(null);
+
+  // XLS network check for balances tab
+  const [networkInfo, setNetworkInfo] = useState<Record<string, unknown> | null>(null);
+  const [networkLoading, setNetworkLoading] = useState(false);
+
+  // Fetch real DID on mount
+  useEffect(() => {
+    backendFetch('/identity/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        challenge: 'nexus-app-session',
+        domain: 'nexus-ledger.local',
+        credential_issuer_did: 'did:example:lockton',
+        employee_label: 'Nexus Traveler',
+      }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        const d = data as Record<string, unknown>;
+        if (d.did) setRealDid(d.did as string);
+      })
+      .catch(() => {});
+  }, []);
+
   const handleSignOut = useCallback(async () => {
     await signOut();
     navigationRef.dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'Welcome' }] }));
   }, [signOut]);
 
-  const shortDid = wallet.did.length > 24 ? `${wallet.did.slice(0, 18)}…${wallet.did.slice(-10)}` : wallet.did;
+  const displayDid = realDid ?? wallet.did;
+  const shortDid = displayDid.length > 24 ? `${displayDid.slice(0, 18)}…${displayDid.slice(-10)}` : displayDid;
 
-  const copyDid = useCallback(() => {
-    Alert.alert('Nexus', 'On supported devices, your DID can be copied for verifiable presentation flows.');
+  // "Verify & sign VP" → triggers real XLS-40 VP signing
+  const verifyIdentity = useCallback(async () => {
+    setVpStatus('loading');
+    try {
+      const res = await backendFetch('/identity/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          challenge: `nexus-verify-${Date.now()}`,
+          domain: 'nexus-ledger.local',
+          credential_issuer_did: 'did:example:lockton',
+          employee_label: 'Nexus Traveler',
+        }),
+      });
+      if (!res.ok) {
+        // Parse the backend error detail instead of showing a generic message
+        let detail = `HTTP ${res.status}`;
+        try {
+          const errBody = (await res.json()) as Record<string, unknown>;
+          detail = (errBody.detail as string) ?? detail;
+        } catch { /* ignore parse errors */ }
+        setVpStatus('error');
+        Alert.alert('Identity error', detail);
+        return;
+      }
+      const data = (await res.json()) as Record<string, unknown>;
+      const did = data.did as string;
+      const presentation = data.presentation as Record<string, unknown>;
+      const proofValue = ((presentation?.proof as Record<string, unknown>)?.jws as string) ?? '';
+      setRealDid(did);
+      setVpProof(proofValue.slice(0, 32) + '…');
+      setVpStatus('ok');
+      Alert.alert(
+        'Identity verified (XLS-40)',
+        `DID: ${did}\n\nVerifiable Presentation signed.\nProof: ${proofValue.slice(0, 24)}…`,
+      );
+    } catch (err) {
+      setVpStatus('error');
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      Alert.alert('Identity error', msg);
+    }
   }, []);
+
+  // Fetch XRPL network account info for balances tab
+  const fetchNetworkInfo = useCallback(async () => {
+    if (!realDid) return;
+    setNetworkLoading(true);
+    try {
+      // Extract XRPL classic address from DID (did:xrpl:1:<network>:<address>)
+      const parts = realDid.split(':');
+      const address = parts[parts.length - 1];
+      const res = await backendFetch(`/xrpl/network-check/${address}`);
+      if (res.ok) {
+        setNetworkInfo((await res.json()) as Record<string, unknown>);
+      }
+    } catch {
+      // fallback to mock wallet data
+    } finally {
+      setNetworkLoading(false);
+    }
+  }, [realDid]);
+
+  useEffect(() => {
+    if (active === 'balances') void fetchNetworkInfo();
+  }, [active, fetchNetworkInfo]);
 
   const submitSend = useCallback(() => {
     const n = parseFloat(sendAmount.replace(/,/g, ''));
@@ -83,9 +176,6 @@ export function ProfileScreen({}: Props) {
         <Text style={[styles.kicker, { color: colors.textMuted }]}>Profile</Text>
         <Text style={[styles.title, { color: colors.text }]}>Identity & wallet</Text>
         <Text style={[styles.sub, { color: colors.textSecondary }]}>Pick a card below.</Text>
-        {authUser ? (
-          <Text style={[styles.authEmail, { color: colors.textMuted }]}>App login: {authUser.email}</Text>
-        ) : null}
       </View>
 
       <View style={styles.hub}>
@@ -128,20 +218,30 @@ export function ProfileScreen({}: Props) {
                     : 'Build a signed transfer intent.'
           }
         />
+
         {active === 'did' ? (
           <Card>
-            <Text style={[styles.label, { color: colors.textMuted }]}>Decentralized ID</Text>
+            <Text style={[styles.label, { color: colors.textMuted }]}>
+              Decentralized ID {realDid ? '· Live (XLS-40)' : '· Resolving…'}
+            </Text>
             <Text style={[styles.mono, { color: colors.text }]} selectable>
               {shortDid}
             </Text>
+            {vpProof ? (
+              <Text style={[styles.vpProof, { color: colors.textMuted }]} selectable>
+                VP proof: {vpProof}
+              </Text>
+            ) : null}
             <LiquidGlassPressable
-              onPress={copyDid}
+              onPress={() => void verifyIdentity()}
               variant="secondary"
               minHeight={44}
               pressableStyle={{ alignSelf: 'flex-start' }}
               innerStyle={styles.linkRowInner}
             >
-              <Text style={[styles.link, { color: colors.text }]}>Copy / verify</Text>
+              <Text style={[styles.link, { color: colors.text }]}>
+                {vpStatus === 'loading' ? 'Signing…' : vpStatus === 'ok' ? 'Re-verify' : 'Verify & sign VP'}
+              </Text>
             </LiquidGlassPressable>
           </Card>
         ) : null}
@@ -189,10 +289,30 @@ export function ProfileScreen({}: Props) {
         {active === 'balances' ? (
           <Card>
             <View style={styles.kv}>
-              <Row label="RLUSD" value={wallet.rlusdBalance} colors={colors} emphasize />
-              <Row label="XRP" value={wallet.xrpBalance} colors={colors} emphasize />
-              <Row label="Trip escrow (USD)" value={`$${wallet.tripEscrowUsd}`} colors={colors} />
-              <Row label="XLS-66 vault available" value={`$${wallet.lendingVaultAvailableUsd}`} colors={colors} />
+              {networkLoading ? (
+                <Text style={{ color: colors.textSecondary }}>Checking XRPL networks…</Text>
+              ) : networkInfo ? (
+                <>
+                  {Object.entries(networkInfo).map(([net, info]) => {
+                    const i = info as Record<string, unknown>;
+                    return (
+                      <Row
+                        key={net}
+                        label={net.replace(/_/g, ' ')}
+                        value={i.found ? `Found · seq ${i.Sequence ?? '—'}` : 'Not funded'}
+                        colors={colors}
+                      />
+                    );
+                  })}
+                </>
+              ) : (
+                <>
+                  <Row label="RLUSD" value={wallet.rlusdBalance} colors={colors} emphasize />
+                  <Row label="XRP" value={wallet.xrpBalance} colors={colors} emphasize />
+                  <Row label="Trip escrow (USD)" value={`$${wallet.tripEscrowUsd}`} colors={colors} />
+                  <Row label="XLS-66 vault available" value={`$${wallet.lendingVaultAvailableUsd}`} colors={colors} />
+                </>
+              )}
             </View>
           </Card>
         ) : null}
@@ -247,7 +367,7 @@ export function ProfileScreen({}: Props) {
         ) : null}
 
         <Card style={{ marginTop: spacing.md }}>
-          <SectionHeader title="App session" subtitle="JWT auth for this app — not your on-chain identity." />
+          <SectionHeader title="App session" subtitle="On-chain identity is separate from your app session." />
           <SecondaryButton title="Sign out" onPress={() => void handleSignOut()} />
         </Card>
 
@@ -284,7 +404,6 @@ const styles = StyleSheet.create({
   kicker: { fontSize: 12, fontWeight: '600', letterSpacing: 0.6, textTransform: 'uppercase' },
   title: { fontSize: 26, fontWeight: '700', marginTop: 4, letterSpacing: -0.4 },
   sub: { fontSize: 15, lineHeight: 22, marginTop: spacing.sm },
-  authEmail: { fontSize: 13, marginTop: spacing.sm, fontWeight: '500' },
   hub: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -304,6 +423,7 @@ const styles = StyleSheet.create({
   hubHint: { fontSize: 12, fontWeight: '500' },
   label: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 6 },
   mono: { fontSize: 13, lineHeight: 20 },
+  vpProof: { fontSize: 11, lineHeight: 16, marginTop: 4, fontFamily: 'monospace' },
   linkRowInner: { marginTop: spacing.sm, paddingVertical: 10, paddingHorizontal: spacing.md },
   link: { fontSize: 15, fontWeight: '600' },
   kv: { gap: spacing.md },

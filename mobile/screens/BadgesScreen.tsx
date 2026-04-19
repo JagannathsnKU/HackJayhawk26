@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
@@ -9,21 +9,60 @@ import { TravelHistoryMap } from '../components/TravelHistoryMap';
 import { NexusBrandLine } from '../components/NexusBrandLine';
 import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
-import { SAMPLE_ITINERARIES } from '../utils/sampleItineraries';
+import { backendFetch } from '../services/apiClient';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Badges'>;
 
 type PhotoItem = { id: string; uri?: string; label: string };
 
-const BADGES = [
-  { id: 'b1', label: 'Pacific rim commuter' },
-  { id: 'b2', label: 'Policy perfect streak' },
-  { id: 'b3', label: 'Carbon aware traveler' },
-];
+type SolanaNft = {
+  booking_id: string;
+  city: string;
+  type: string;
+  amount_xrp: number | null;
+  xrpl_tx_hash: string | null;
+  mint_address: string | null;
+  explorer_url: string | null;
+  timestamp: string;
+};
+
+type Booking = {
+  booking_id: string;
+  type: string;
+  city: string;
+  date: string;
+  amount_xrp: number;
+  xrpl_tx_hash: string;
+  timestamp: string;
+};
 
 export function BadgesScreen({}: Props) {
   const colors = useAppTheme();
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
+  const [nfts, setNfts] = useState<SolanaNft[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loadingNfts, setLoadingNfts] = useState(true);
+
+  useEffect(() => {
+    // Fetch Solana NFTs (minted on each confirmed booking)
+    backendFetch('/solana/nfts')
+      .then((r) => r.json())
+      .then((data) => {
+        const d = data as { nfts: SolanaNft[] };
+        setNfts(d.nfts ?? []);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingNfts(false));
+
+    // Fetch real bookings from memory for the archive
+    backendFetch('/memory')
+      .then((r) => r.json())
+      .then((data) => {
+        const d = data as { recent_bookings?: Booking[] };
+        setBookings(d.recent_bookings ?? []);
+      })
+      .catch(() => {});
+  }, []);
 
   const addFromLibrary = useCallback(async () => {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -57,15 +96,38 @@ export function BadgesScreen({}: Props) {
         <NexusBrandLine />
         <Text style={[styles.title, { color: colors.text }]}>Badges</Text>
 
+        {/* Solana NFT badges — one per confirmed booking destination */}
+        <Text style={[styles.section, { color: colors.textMuted }]}>
+          {loadingNfts ? 'Loading NFT badges…' : nfts.length > 0 ? `Destination NFTs · ${nfts.length} minted on Solana` : 'No NFT badges yet — book a trip to mint one'}
+        </Text>
+
         <View style={{ gap: spacing.sm }}>
-          {BADGES.map((b) => (
-            <View
-              key={b.id}
-              style={[styles.badgeCard, { borderColor: colors.border, backgroundColor: colors.surface }]}
-            >
-              <Text style={[styles.badgeTitle, { color: colors.text }]}>{b.label}</Text>
+          {nfts.length > 0 ? (
+            nfts.map((nft) => (
+              <View
+                key={nft.booking_id}
+                style={[styles.badgeCard, { borderColor: colors.border, backgroundColor: colors.surface }]}
+              >
+                <Text style={[styles.badgeTitle, { color: colors.text }]}>
+                  {nft.city} · {nft.type}
+                </Text>
+                <Text style={[styles.badgeMeta, { color: colors.textMuted }]}>
+                  {nft.amount_xrp != null ? `${nft.amount_xrp} XRP` : '—'}
+                  {nft.mint_address ? ` · NFT: ${nft.mint_address.slice(0, 8)}…` : ''}
+                </Text>
+                {nft.xrpl_tx_hash ? (
+                  <Text style={[styles.badgeTx, { color: colors.textMuted }]} selectable>
+                    XRPL: {nft.xrpl_tx_hash.slice(0, 20)}…
+                  </Text>
+                ) : null}
+              </View>
+            ))
+          ) : !loadingNfts ? (
+            // Placeholder until first booking is made
+            <View style={[styles.badgeCard, { borderColor: colors.border, backgroundColor: colors.surface }]}>
+              <Text style={[styles.badgeTitle, { color: colors.textMuted }]}>Your first destination badge will appear here</Text>
             </View>
-          ))}
+          ) : null}
         </View>
 
         <TravelHistoryMap />
@@ -107,12 +169,17 @@ export function BadgesScreen({}: Props) {
           ))}
         </View>
 
+        {/* Archive — real bookings from XRPL memory */}
         <Text style={[styles.section, { color: colors.textMuted }]}>Archive</Text>
-        {SAMPLE_ITINERARIES.map((s) => (
-          <Text key={s.id} style={[styles.archiveLine, { color: colors.textSecondary }]}>
-            · {s.title}
-          </Text>
-        ))}
+        {bookings.length > 0 ? (
+          bookings.map((b) => (
+            <Text key={b.booking_id} style={[styles.archiveLine, { color: colors.textSecondary }]}>
+              · {b.city} {b.type} · {b.amount_xrp} XRP · {b.date}
+            </Text>
+          ))
+        ) : (
+          <Text style={[styles.archiveLine, { color: colors.textMuted }]}>No bookings yet.</Text>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -127,8 +194,10 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   title: { fontSize: 24, fontWeight: '800' },
-  badgeCard: { borderRadius: 14, borderWidth: StyleSheet.hairlineWidth, padding: spacing.md },
+  badgeCard: { borderRadius: 14, borderWidth: StyleSheet.hairlineWidth, padding: spacing.md, gap: 4 },
   badgeTitle: { fontSize: 16, fontWeight: '800' },
+  badgeMeta: { fontSize: 13 },
+  badgeTx: { fontSize: 11, fontFamily: 'monospace' },
   section: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase' },
   pickRow: { flexDirection: 'row', gap: spacing.sm },
   pickFlex: { flex: 1 },

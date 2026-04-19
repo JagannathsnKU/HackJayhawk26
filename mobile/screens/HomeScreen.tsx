@@ -8,7 +8,6 @@ import { HubTile } from '../components/HubTile';
 import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
 import { radii, screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { PAST_TRIP_LIST } from '../utils/pastTrips';
-import { VoiceAgentFab } from '../components/ui/voice-agent-fab';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MainHome'>;
 
@@ -146,12 +145,6 @@ export function HomeScreen({ navigation }: Props) {
           <HubTile title="Badges" icon="★" compact onPress={() => navigation.navigate('Badges')} />
         </View>
         </ScrollView>
-        <VoiceAgentFab
-          accent={colors.accent}
-          text={colors.text}
-          textMuted={colors.textMuted}
-          onAccent={colors.onAccent}
-        />
       </View>
     </SafeAreaView>
   );

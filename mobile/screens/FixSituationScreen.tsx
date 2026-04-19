@@ -10,6 +10,7 @@ import { PrimaryButton } from '../components/PrimaryButton';
 import { SecondaryButton } from '../components/SecondaryButton';
 import { SectionHeader } from '../components/SectionHeader';
 import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
+import { backendFetch } from '../services/apiClient';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'FixSituation'>;
 
@@ -33,9 +34,14 @@ export function FixSituationScreen({ navigation, route }: Props) {
   const [compareVisible, setCompareVisible] = useState(false);
   const [busy, setBusy] = useState(false);
 
+  // XLS-66 emergency loan state
+  const [loanBusy, setLoanBusy] = useState(false);
+  const [loanResult, setLoanResult] = useState<{ ok: boolean; message: string; txHash?: string } | null>(null);
+
   const startResolution = async (cat: IssueCategory) => {
     setBusy(true);
     setIssue(cat);
+    setLoanResult(null);
     try {
       const res = await services.assistant.resolveIssue(cat);
       setMessage(res.message);
@@ -53,6 +59,47 @@ export function FixSituationScreen({ navigation, route }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot from route on open
   }, [route.params?.focus]);
 
+  // XLS-66: real emergency LoanSet transaction on XRPL
+  const requestVaultDraw = async () => {
+    setLoanBusy(true);
+    setLoanResult(null);
+    try {
+      const res = await backendFetch('/agent/emergency-loan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          loan_broker_id: 'rDefaultBroker',
+          principal_requested_drops: '50000000',
+          payment_interval: 86400,
+          payment_total: 52500000,
+          grace_period: 3600,
+        }),
+      });
+      const data = (await res.json()) as Record<string, unknown>;
+      if (data.ok) {
+        const txHash = data.tx_hash as string;
+        setLoanResult({
+          ok: true,
+          message: (data.message as string) ?? 'Emergency funds secured.',
+          txHash,
+        });
+        Alert.alert(
+          'XLS-66 LoanSet confirmed',
+          `Emergency funds secured on XRPL.\n\nTx: ${txHash.slice(0, 16)}…`,
+        );
+      } else {
+        const explanation = (data.hook_explanation as string) ?? (data.engine_result as string) ?? 'Transaction blocked.';
+        setLoanResult({ ok: false, message: explanation });
+        Alert.alert('Blocked by hook', explanation);
+      }
+    } catch {
+      setLoanResult({ ok: false, message: 'Could not reach backend. Make sure the server is running.' });
+      Alert.alert('Nexus', 'Could not reach backend. Make sure the server is running.');
+    } finally {
+      setLoanBusy(false);
+    }
+  };
+
   const accept = (s: AssistantSuggestion) => {
     navigation.navigate('PaymentApproval', {
       title: s.title,
@@ -66,6 +113,7 @@ export function FixSituationScreen({ navigation, route }: Props) {
     setIssue(null);
     setMessage('');
     setOptions([]);
+    setLoanResult(null);
   };
 
   return (
@@ -107,17 +155,27 @@ export function FixSituationScreen({ navigation, route }: Props) {
                 <Text style={[styles.emergencyEyebrow, { color: colors.textMuted }]}>Emergency · Vault access</Text>
                 <Text style={[styles.emergencyHeadline, { color: colors.text }]}>Short-term flash borrow (XLS-66)</Text>
                 <Text style={[styles.emergencyCopy, { color: colors.textSecondary }]}>
-                  If you are stranded or out of funds, the system can request a temporary on-chain liquidity advance.
-                  Funds are released only after a travel-risk and intent check are verified.
+                  If you are stranded or out of funds, the system requests a temporary on-chain liquidity advance.
+                  Funds are released only after a travel-risk and intent check are verified on the XRPL Lending Devnet.
                 </Text>
+
+                {loanResult ? (
+                  <View style={[styles.loanResult, { borderColor: loanResult.ok ? colors.success : colors.danger }]}>
+                    <Text style={[styles.loanResultText, { color: loanResult.ok ? colors.success : colors.danger }]}>
+                      {loanResult.ok ? '✓ ' : '✗ '}{loanResult.message}
+                    </Text>
+                    {loanResult.txHash ? (
+                      <Text style={[styles.loanTxHash, { color: colors.textMuted }]} selectable>
+                        Tx: {loanResult.txHash.slice(0, 20)}…
+                      </Text>
+                    ) : null}
+                  </View>
+                ) : null}
+
                 <PrimaryButton
-                  title="Request vault draw"
-                  onPress={() =>
-                    Alert.alert(
-                      'Nexus',
-                      'A vault draw would run with policy checks and auto-repayment on settlement once treasury is connected.',
-                    )
-                  }
+                  title={loanBusy ? 'Submitting XLS-66…' : loanResult?.ok ? 'Draw again' : 'Request vault draw'}
+                  onPress={() => void requestVaultDraw()}
+                  loading={loanBusy}
                 />
               </View>
             ) : null}
@@ -199,6 +257,14 @@ const styles = StyleSheet.create({
   emergencyEyebrow: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase' },
   emergencyHeadline: { fontSize: 17, fontWeight: '800' },
   emergencyCopy: { fontSize: 14, lineHeight: 20 },
+  loanResult: {
+    padding: spacing.sm,
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    gap: 4,
+  },
+  loanResultText: { fontSize: 14, fontWeight: '700' },
+  loanTxHash: { fontSize: 11, fontFamily: 'monospace' },
   ai: { fontSize: 16, lineHeight: 24, fontWeight: '600' },
   optionList: { gap: spacing.md },
   optionCard: { gap: spacing.sm },

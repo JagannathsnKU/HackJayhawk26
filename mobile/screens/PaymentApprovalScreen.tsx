@@ -32,15 +32,27 @@ export function PaymentApprovalScreen({ navigation, route }: Props) {
       const result = await services.payment.authorizePayment({
         amountUsd,
         description: title,
+        vendorName: title,
         itineraryItemId,
       });
-      const msg =
-        result.status === 'approved_auto'
-          ? 'Approved automatically under current policy rules.'
-          : result.status === 'requires_approval'
-            ? 'Approval request queued for your manager.'
-            : 'Not allowed under current policy rules.';
-      Alert.alert('Payment', msg, [{ text: 'OK', onPress: () => navigation.goBack() }]);
+      if (result.status === 'approved_auto') {
+        Alert.alert(
+          'Booking confirmed',
+          `Payment processed on XRPL.\nRef: ${result.reference}`,
+          [{ text: 'OK', onPress: () => navigation.goBack() }],
+        );
+      } else if (result.status === 'requires_approval') {
+        Alert.alert('Approval required', 'Request queued for your manager.', [
+          { text: 'OK', onPress: () => navigation.goBack() },
+        ]);
+      } else {
+        Alert.alert('Not allowed', `Blocked: ${result.reference}`, [
+          { text: 'OK', onPress: () => navigation.goBack() },
+        ]);
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      Alert.alert('Error', msg);
     } finally {
       setBusy(false);
     }

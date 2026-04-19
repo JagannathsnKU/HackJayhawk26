@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nexus-ledger-backend"
+version = "0.1.0"
+description = "Async FastAPI backend for Nexus Ledger"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+  "elevenlabs>=1.12",
+  "fastapi>=0.115",
+  "httpx>=0.27",
+  "pydantic>=2.8",
+  "pydantic-settings>=2.4",
+  "python-dotenv>=1.0",
+  "python-multipart>=0.0.9",
+  "uvicorn[standard]>=0.30",
+  "websockets>=12.0",
+  "xrpl-py>=4.0",
+  "mcp>=1.0",
+  "solana>=0.34.0",
+  "base58>=2.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3",
+  "pytest-asyncio>=0.23",
+]
+
+[tool.setuptools]
+packages = ["app"]

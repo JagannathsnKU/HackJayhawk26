@@ -1,30 +1,100 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { RootStackScreenProps } from '../navigation/types';
 import type { HookDecision, HookTransactionEvent } from '../models/types';
-import { useAppState } from '../context/AppProvider';
 import { screenPaddingX, spacing, useAppTheme } from '../utils/theme';
 import { Card } from '../components/Card';
 import { DrillDownModal } from '../components/DrillDownModal';
 import { SectionHeader } from '../components/SectionHeader';
 import { NexusBrandLine } from '../components/NexusBrandLine';
 import { LiquidGlassPressable } from '../components/LiquidGlassPressable';
+import { backendFetch } from '../services/apiClient';
 
 type Props = RootStackScreenProps<'Transactions'>;
 
 type Filter = 'all' | HookDecision;
 
+type MemoryBooking = {
+  booking_id: string;
+  type: string;
+  city: string;
+  date: string;
+  amount_xrp: number;
+  xrpl_tx_hash: string;
+  solana_mint?: string;
+  timestamp: string;
+};
+
+type MemoryLoan = {
+  amount_drops: string;
+  loan_broker_id: string;
+  tx_hash: string;
+  timestamp: string;
+};
+
+function bookingToEvent(b: MemoryBooking): HookTransactionEvent {
+  const cat: HookTransactionEvent['category'] =
+    b.type === 'flight' ? 'airline' : b.type === 'hotel' ? 'hotel' : b.type === 'ground' ? 'ground' : 'other';
+  return {
+    id: b.booking_id,
+    timeLabel: new Date(b.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    merchant: `${b.city} · ${b.type}`,
+    category: cat,
+    amountUsd: Math.round(b.amount_xrp * 2),
+    decision: 'passed',
+    hookChecks: [
+      { id: 'xrpl', label: 'XRPL payment confirmed (XLS-66)', ok: true },
+      { id: 'policy', label: 'Corporate policy check', ok: true },
+      { id: 'solana', label: `Solana NFT minted${b.solana_mint ? `: ${b.solana_mint.slice(0, 8)}…` : ''}`, ok: !!b.solana_mint },
+    ],
+    companionAuthorized: true,
+    reference: b.xrpl_tx_hash ? b.xrpl_tx_hash.slice(0, 12) : undefined,
+  };
+}
+
+function loanToEvent(loan: MemoryLoan, index: number): HookTransactionEvent {
+  const xrp = parseInt(loan.amount_drops, 10) / 1_000_000;
+  return {
+    id: loan.tx_hash || `loan-${index}`,
+    timeLabel: new Date(loan.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    merchant: 'XRPL Lending Protocol (XLS-66)',
+    category: 'other',
+    amountUsd: Math.round(xrp * 2),
+    decision: 'passed',
+    hookChecks: [
+      { id: 'loanset', label: 'XLS-66 LoanSet submitted', ok: true },
+      { id: 'broker', label: `Broker: ${loan.loan_broker_id}`, ok: true },
+    ],
+    companionAuthorized: true,
+    reference: loan.tx_hash ? loan.tx_hash.slice(0, 12) : undefined,
+  };
+}
+
 export function TransactionsScreen({}: Props) {
   const colors = useAppTheme();
-  const { hookEvents } = useAppState();
   const [filter, setFilter] = useState<Filter>('all');
   const [detail, setDetail] = useState<HookTransactionEvent | null>(null);
+  const [events, setEvents] = useState<HookTransactionEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    backendFetch('/memory')
+      .then((r) => r.json())
+      .then((data) => {
+        const d = data as { recent_bookings?: MemoryBooking[]; loans?: MemoryLoan[] };
+        const bookingEvents = (d.recent_bookings ?? []).map(bookingToEvent);
+        const loanEvents = (d.loans ?? []).map(loanToEvent);
+        setEvents([...bookingEvents, ...loanEvents].sort((a, b) => a.timeLabel.localeCompare(b.timeLabel)));
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   const filtered = useMemo(() => {
-    if (filter === 'all') return hookEvents;
-    return hookEvents.filter((e) => e.decision === filter);
-  }, [hookEvents, filter]);
+    if (filter === 'all') return events;
+    return events.filter((e) => e.decision === filter);
+  }, [events, filter]);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: 'transparent' }]} edges={['top', 'left', 'right']}>
@@ -32,7 +102,7 @@ export function TransactionsScreen({}: Props) {
         <NexusBrandLine />
         <Text style={[styles.title, { color: colors.text }]}>Treasury hooks</Text>
         <Text style={[styles.sub, { color: colors.textSecondary }]}>
-          Tap a row to review hook checks and treasury context for that event.
+          {loading ? 'Loading transactions…' : `${events.length} on-chain event(s) · tap a row for hook trace.`}
         </Text>
 
         <View style={styles.filterRow}>
@@ -62,6 +132,11 @@ export function TransactionsScreen({}: Props) {
 
         <View style={styles.section}>
           <SectionHeader title="Case files" subtitle="One line per spend — tap for hook trace." />
+          {filtered.length === 0 && !loading ? (
+            <Text style={[styles.empty, { color: colors.textMuted }]}>
+              No transactions yet. Book a trip or request a vault draw to see live XRPL events here.
+            </Text>
+          ) : null}
           {filtered.map((ev) => (
             <LiquidGlassPressable
               key={ev.id}
@@ -89,7 +164,7 @@ export function TransactionsScreen({}: Props) {
         <Card style={styles.legend}>
           <Text style={[styles.legendTitle, { color: colors.text }]}>Scenario guide</Text>
           <Text style={[styles.legendBody, { color: colors.textSecondary }]}>
-            Passed: policy satisfied on-ledger. Blocked: spend never settles. Pending: needs policy approval or signed authorization.
+            Passed: payment confirmed on XRPL + Solana NFT minted. Blocked: spend rejected by hook. Pending: awaiting policy approval.
           </Text>
         </Card>
       </ScrollView>
@@ -145,6 +220,7 @@ const styles = StyleSheet.create({
   filterChipInner: { paddingVertical: 8, paddingHorizontal: spacing.md },
   filterLabel: { fontSize: 13, fontWeight: '700' },
   section: { marginTop: spacing.lg, gap: spacing.sm },
+  empty: { fontSize: 14, lineHeight: 22, marginTop: spacing.sm },
   compactRowInner: {
     flexDirection: 'row',
     alignItems: 'center',

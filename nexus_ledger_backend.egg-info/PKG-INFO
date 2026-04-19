@@ -1,0 +1,84 @@
+Metadata-Version: 2.4
+Name: nexus-ledger-backend
+Version: 0.1.0
+Summary: Async FastAPI backend for Nexus Ledger
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+Requires-Dist: elevenlabs>=1.12
+Requires-Dist: fastapi>=0.115
+Requires-Dist: httpx>=0.27
+Requires-Dist: pydantic>=2.8
+Requires-Dist: pydantic-settings>=2.4
+Requires-Dist: python-dotenv>=1.0
+Requires-Dist: python-multipart>=0.0.9
+Requires-Dist: uvicorn[standard]>=0.30
+Requires-Dist: websockets>=12.0
+Requires-Dist: xrpl-py>=4.0
+Requires-Dist: mcp>=1.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.3; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.23; extra == "dev"
+
+# Nexus Ledger Backend
+
+Async FastAPI backend for a travel companion that orchestrates XRPL identity, funding, Hooks interpretation, and voice I/O.
+
+## What this backend does
+
+It uses a hot-wallet architecture for autonomous agent signing. The backend loads a burner secret from environment variables, prepares XLS-40 style DID proofs and a selective-disclosure VP for the "Lockton Employee" claim, submits XLS-66 LoanSet transactions to Lending Devnet, interprets Hooks-style rejection codes, and supports voice input/output integration.
+
+## Hot-wallet flow
+
+1. The backend reads `AGENT_SECRET` from `.env`.
+1. `Wallet.from_seed()` initializes the software signer.
+1. `/agent/emergency-loan` creates and submits a `LoanSet` transaction with `submit_and_wait()`.
+1. `/agent/mock-booking` generates a mock hotel/flight confirmation but performs a real XRP `Payment` transaction.
+1. `/identity/verify` builds a VP and signs its proof-of-possession with the wallet key.
+1. If the ledger returns a Hooks-style rejection code, the API returns a human explanation string for voice playback.
+
+## Setup
+
+Create `.env` from `.env.example` and fill values:
+
+```
+XRPL_LENDING_URL=wss://lend.devnet.rippletest.net:51233/
+AGENT_SECRET=sEDV...your_burner_seed
+MOCK_BOOKING_DESTINATION=r...devnet_receiver
+MOCK_BOOKING_AMOUNT_DROPS=1000000
+ELEVENLABS_API_KEY=your_key_here
+```
+
+## Run it
+
+Install dependencies, then launch:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Swagger UI will be available at `/docs` and the WebSocket test endpoint is `/ws/terminal`.
+
+## Core endpoints
+
+- `POST /agent/emergency-loan`: submits an XLS-66 `LoanSet` with hot-wallet signing and waits for validation.
+- `POST /agent/mock-booking`: creates a mock travel booking and confirms it after a real XRP payment transaction.
+- `POST /agent/sign-hash`: signs a message hash with the hot wallet for proof-of-signing demos.
+- `POST /identity/verify`: creates a DID-linked VP and signs a proof-of-possession.
+- `GET /xrpl/network-check/{address}`: checks where an address is currently active.
+- `POST /hooks/interpret`: converts transaction rejection codes into agent-friendly explanations.
+- `POST /voice/stt` and `POST /voice/tts`: voice input and output integration points.
+
+## Network detection endpoint
+
+Use `GET /xrpl/network-check/{address}` to check whether an address exists on Testnet, Devnet, or Lending Devnet. This helps you avoid signing on the wrong network when your Ledger account was funded elsewhere.
+
+## Important constraint
+
+XLS-65 and XLS-66 support depends on current Devnet amendment state and model compatibility. For demo safety, use a burner key only and keep production funds on separate cold infrastructure.
+
+## Hackathon demo script
+
+1. Call `POST /agent/sign-hash` with a sentence to show deterministic wallet signing output.
+1. Call `POST /identity/verify` with a nonce challenge to return VP + proof.
+1. Call `POST /agent/mock-booking` with `booking_type`, `destination_city`, and `travel_date`.
+1. Read back `booking.confirmation_code` and `payment.result` to show mock booking plus real XRP movement.

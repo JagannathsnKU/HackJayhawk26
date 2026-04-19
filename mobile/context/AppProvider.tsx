@@ -5,11 +5,11 @@ import type { PaymentService } from '../services/paymentService';
 import type { PolicyService } from '../services/policyService';
 import type { TravelService } from '../services/travelService';
 import {
-  createMockAssistantService,
+  createApiAssistantService,
+  createApiPaymentService,
+  createApiTravelService,
   createMockIdentityService,
-  createMockPaymentService,
   createMockPolicyService,
-  createMockTravelService,
 } from '../services';
 import type {
   AppNotification,
@@ -44,11 +44,11 @@ type AppState = {
 const AppContext = createContext<AppState | null>(null);
 
 const defaultServices: Services = {
-  travel: createMockTravelService(),
+  travel: createApiTravelService(),
   policy: createMockPolicyService(),
   identity: createMockIdentityService(),
-  payment: createMockPaymentService(),
-  assistant: createMockAssistantService(),
+  payment: createApiPaymentService(),
+  assistant: createApiAssistantService(),
 };
 
 export function AppProvider({

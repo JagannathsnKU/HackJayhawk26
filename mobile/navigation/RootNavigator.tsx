@@ -36,6 +36,7 @@ import { RegisterScreen } from '../screens/RegisterScreen';
 import { PastTripSummaryScreen } from '../screens/PastTripSummaryScreen';
 import { GlobeMapScreen } from '../screens/GlobeMapScreen';
 import { GlobeMapTapOverlay } from '../components/GlobeMapTapOverlay';
+import { VoiceAgentFab } from '../components/ui/voice-agent-fab';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -158,6 +159,14 @@ export function RootNavigator() {
           </Stack.Navigator>
         </NavigationContainer>
         <GlobeMapTapOverlay currentRouteName={navRoute} navigationReady={navigationReady} />
+        {navRoute === 'MainHome' ? (
+          <VoiceAgentFab
+            accent={c.accent}
+            text={c.text}
+            textMuted={c.textMuted}
+            onAccent={c.onAccent}
+          />
+        ) : null}
       </View>
     </View>
   );
