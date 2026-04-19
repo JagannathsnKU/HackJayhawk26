@@ -1,0 +1,17 @@
+/* Landing hero — black field, white typography tokens (matches app theme). */
+:root {
+  --background: 0, 0%, 0%;
+  --foreground: 0, 0%, 100%;
+  --muted: 0, 0%, 62%;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
